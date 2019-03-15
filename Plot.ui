@@ -46,7 +46,7 @@
   <widget class="QPushButton" name="Plot">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>530</x>
      <y>600</y>
      <width>131</width>
      <height>31</height>
@@ -59,7 +59,7 @@
   <widget class="QLineEdit" name="rotationAngle">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>10</x>
      <y>600</y>
      <width>151</width>
      <height>31</height>
@@ -115,6 +115,32 @@
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="tr">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>600</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="te">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>600</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
