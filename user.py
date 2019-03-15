@@ -17,7 +17,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.time  = np.arange(0, 10,0.001) #in sec but step in 1 msec
         self.vector= np.matrix ([0,0,1]) #da range sabt
 
-        pixelIntensity = 200 #depend on pixel choosen
+        pixelIntensity = 50 #depend on pixel choosen
         self.T1 = self.createT1(pixelIntensity)
         self.T2 = self.createT2(pixelIntensity)
         self.PD = self.createPD(pixelIntensity)
@@ -26,11 +26,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def plot(self):
         DecayMx = self.ui.decayMx
-        DecayMy = self.ui.decayMy
+        #DecayMy = self.ui.decayMy
         RecoveryMz = self.ui.recoveryMz
 
         DecayMx.clear()
-        DecayMy.clear()
+        #DecayMy.clear()
         RecoveryMz.clear()
 
         theta = ((float) (self.ui.rotationAngle.text())) #5ly balk not global
@@ -38,7 +38,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         RecoveryDecayMatrix = self.recoveryDecayEquation(self.T1,self.T2,self.PD,vector)
    
         DecayMx.plot(self.time,np.array(RecoveryDecayMatrix[0,:]).ravel())
-        DecayMy.plot(self.time,np.array(RecoveryDecayMatrix[1,:]).ravel())
+        #DecayMy.plot(self.time,np.array(RecoveryDecayMatrix[1,:]).ravel())
         RecoveryMz.plot(self.time,np.array(RecoveryDecayMatrix[2,:]).ravel())
 
         #plot.showGrid(x=True, y=True, alpha=1)

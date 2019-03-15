@@ -2,6 +2,8 @@
 import numpy as np
 
 from matplotlib import pyplot as plt
+from imageio import imsave, imread
+from PIL import Image
 
 #Generate random array of zeros 512 rows and 512 columns
 
@@ -37,8 +39,10 @@ img[x4:x4+250, y4:y4+250] = box4
 img[x5:x5+300, y5:y5+300] = box5
 
 #plot in gray scale
-
-plt.imshow(img, cmap="gray")
+img = img.astype(np.uint8)
+imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png", img)
+img2 = imread("phantom1.png")
+plt.imshow(img2, cmap="gray")
 plt.show()
 
 
