@@ -36,7 +36,7 @@ def recoveryDecayEquation(T1,T2,PD,vector):
     return RD
 
 
-time  = np.arange(0, 10,1) #in sec but step in 1 msec
+time  = np.arange(0, 10,0.001) #in sec but step in 1 msec
 #print(time)
 vector= np.matrix ([0,0,1])
 
@@ -48,7 +48,10 @@ PD = createPD(pixelIntensity)
 
 vector = rotationAroundYaxisMatrix(theta,vector)
 RecoveryDecayMatrix = (recoveryDecayEquation(T1,T2,PD,vector))
-y = RecoveryDecayMatrix[0,:].tolist()
+x = RecoveryDecayMatrix[0,:]
+print(x)
+print(x.shape)
+y = np.array(RecoveryDecayMatrix[0,:]).ravel()
 print(y)
 print(type(y))
 
