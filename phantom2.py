@@ -36,31 +36,65 @@ img[x4:x4+100, y4:y4+50] = box4
 img[x5:x5+50, y5:y5+70] = box5
 
 
-def createT1AndT2(intensity):
+# a function that returns T1 ( recovery time ) based on the intensity
+def create_T1(intensity):
+
     if intensity == 100: #Gray matter
         T1=900
-        T2 =90
+        
     elif intensity == 255: #white matter
         T1= 510
-        T2 =70
+       
     elif intensity == 200: #muscle
         T1=900
-        T2 = 50
+       
     elif intensity == 120 : #fat
-        T1=250
-        T2 = 70
+        T1=300
+        
     elif intensity == 25: #protein
         T1=250
-        T2 = 1
-    elif intensity == 0: #Black => aiir
+        
+    elif intensity == 0: #Black => air
         T1=0
+        
+    else: # general case for any phantom whatever its intensity 
+        T1 = (7.5*intensity) + 50
+
+    return T1
+
+
+# a function that returns T2 ( decay time ) based on the intensity
+def create_T2(intensity):
+
+    if intensity == 100: #Gray matter
+        T2 =90
+   
+    elif intensity == 255: #white matter       
+        T2 =70
+
+    elif intensity == 200: #muscle        
+        T2 = 50
+
+    elif intensity == 120 : #fat        
+        T2 = 100
+
+    elif intensity == 25: #protein       
+        T2 = 30
+
+    elif intensity == 0: #Black => air        
         T2=0
-    return T1,T2
+
+    else: # general case for any phantom whatever its intensity 
+        T2 = 0.5*intensity
+
+    return T2
+
 
 
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        [T1[i,j],T2[i,j]]=createT1AndT2( img[i,j])
+        T1[i,j]=create_T1(img[i,j])
+        T2[i,j]=create_T2(img[i,j])
 
 
 

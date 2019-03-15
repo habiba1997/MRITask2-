@@ -36,9 +36,75 @@ img[x3:x3+125, y3:y3+125] = box3
 img[x4:x4+250, y4:y4+250] = box4
 img[x5:x5+300, y5:y5+300] = box5
 
+
+# a function that returns T1 ( recovery time ) based on the intensity
+def create_T1(intensity):
+
+    if intensity == 255: #Gray matter
+        T1=900
+        
+    elif intensity == 125: #white matter
+        T1= 510
+       
+    elif intensity == 200: #muscle
+        T1=900
+       
+    elif intensity == 150 : #fat
+        T1=300
+        
+    elif intensity == 50: #protein
+        T1=250
+        
+    elif intensity == 0: #Black => air
+        T1=0
+        
+ # general case for any phantom whatever its intensity - el equation ana alft-ha based on eny ma5rogsh mn el limits - a3tqd en dah msh mkanha msh fy el file bta3 el phantom nfso l2n el intensities gowah limited by which was created 
+    else:
+        T1 = (7.5*intensity) + 50
+
+    return T1
+
+
+# a function that returns T2 ( decay time ) based on the intensity
+def create_T2(intensity):
+
+    if intensity == 255: #Gray matter
+        T2 =90
+   
+    elif intensity == 125: #white matter       
+        T2 =70
+
+    elif intensity == 200: #muscle        
+        T2 = 50
+
+    elif intensity == 150 : #fat        
+        T2 = 100
+
+    elif intensity == 50: #protein       
+        T2 = 30
+
+    elif intensity == 0: #Black => air        
+        T2=0
+
+    else: # general case for any phantom whatever its intensity 
+        T2 = 0.5*intensity
+
+    return T2
+
+
+
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+        T1[i,j]=create_T1(img[i,j])
+        T2[i,j]=create_T2(img[i,j])
+
+
+
+
+
 #plot in gray scale
 
-plt.imshow(img, cmap="gray")
-plt.show()
+#plt.imshow(img, cmap="gray")
+#plt.show()
 
 
