@@ -208,17 +208,13 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             #self.paint4 = False
-            self.paint5 = True
-
-
         if self.count == 5:
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.ui.t2Plot.clear()
-                self.ui.t1Plot.clear()
-            #self.pixmap = QtGui.QPixmap(self.fileName)
-            self.ui.comboBox.activated.connect(self.getText)
-            pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
+            if self.text == '180':
+                self.pixmap = QtGui.QPixmap(self.fileName)
+                self.pixmap = self.pixmap.scaled(180,180)
+            if self.text == '520':
+                self.pixmap = QtGui.QPixmap(self.fileName)
+            #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
