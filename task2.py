@@ -112,6 +112,7 @@ class window(QtWidgets.QMainWindow):
             self.pixmap0 = self.pixmap
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
 
@@ -130,6 +131,7 @@ class window(QtWidgets.QMainWindow):
             self.pixmap1 = self.pixmap0
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             self.paint1 = True
@@ -149,6 +151,7 @@ class window(QtWidgets.QMainWindow):
             self.pixmap2 = self.pixmap1
             #self.pixmap1 = self.pixmap1.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap1) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             self.paint2 = True
@@ -166,6 +169,7 @@ class window(QtWidgets.QMainWindow):
             self.pixmap3 = self.pixmap2
             #self.pixmap2 = self.pixmap2.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap2) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show() 
             self.paint3 = True
@@ -183,6 +187,7 @@ class window(QtWidgets.QMainWindow):
             self.pixmap4 = self.pixmap3
             #self.pixmap3 = self.pixmap3.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap3) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()    
             self.paint4 = True
@@ -197,9 +202,9 @@ class window(QtWidgets.QMainWindow):
             painter.setPen(QtGui.QPen(QtCore.Qt.darkGray))
             painter.drawEllipse(self.x, self.y, 8, 8)
             painter.end()
-            self.pixmap5 = self.pixmap4
             #self.pixmap4 = self.pixmap4.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap4) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             #self.paint4 = False
@@ -211,9 +216,11 @@ class window(QtWidgets.QMainWindow):
                 self.count = -1
                 self.ui.t2Plot.clear()
                 self.ui.t1Plot.clear()
-            pixmap = QtGui.QPixmap(self.fileName)
-            #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(pixmap) # Set the pixmap onto the label
+            #self.pixmap = QtGui.QPixmap(self.fileName)
+            self.ui.comboBox.activated.connect(self.getText)
+            pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
+            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
+            self.ui.image.adjustSize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             self.count = -1
