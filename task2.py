@@ -47,6 +47,20 @@ class window(QtWidgets.QMainWindow):
         self.x = 90
         self.y = 90
         self.count = -1
+        self.text = '520'
+
+    def getText(self, index):
+        self.text = self.ui.comboBox.itemText(index)
+        if self.text == '520':
+            self.pixmap = QtGui.QPixmap(self.fileName)
+            #self.pixmap = self.pixmap.scaled(180,180)
+
+        if self.text == '180':
+            self.pixmap = QtGui.QPixmap(self.fileName)
+            self.pixmap = self.pixmap.scaled(180,180)
+            print('sa7')
+
+
     def setImage(self):
         self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)") # Ask for file
         if self.fileName: # If the user gives a file
@@ -56,6 +70,11 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.mousePressEvent = self.getPixel
             self.ui.lineEdit.textChanged.connect((self.plot))
             self.paint = True
+            self.ui.comboBox.activated.connect(self.getText)
+            self.pixmap = QtGui.QPixmap(self.fileName)
+
+
+
             print(self.img[self.x,self.y])
 
     def mousePressEvent(self, e):
@@ -90,27 +109,38 @@ class window(QtWidgets.QMainWindow):
 
     def paintEvent(self, event):
         if self.paint and self.count == -1:
-            pixmap = QtGui.QPixmap(self.fileName)
+            self.pixmap0 = self.pixmap
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(pixmap) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
+
         if self.paint and self.count == 0:    
-            pixmap = QtGui.QPixmap(self.fileName) # Setup pixmap with the provided image
-            painter = QtGui.QPainter(pixmap)
+            #pixmap = QtGui.QPixmap(self.fileName) # Setup pixmap with the provided image
+            if self.pixmap0 != self.pixmap:
+                self.count = -1
+                self.ui.t2Plot.clear()
+                self.ui.t1Plot.clear()
+            painter = QtGui.QPainter(self.pixmap0)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             pen = QtGui.QPen(QtCore.Qt.red)
             painter.setPen(pen)
             painter.drawEllipse(self.x, self.y, 8, 8)
             painter.end()
-            self.pixmap1 = pixmap
+            self.pixmap1 = self.pixmap0
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(pixmap) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             self.paint1 = True
-            #self.paint = False      
+
+            #self.paint = False  
+                
         if  self.paint1 and self.count == 1:
+            if self.pixmap0 != self.pixmap:
+                self.count = -1
+                self.ui.t2Plot.clear()
+                self.ui.t1Plot.clear()
             painter = QtGui.QPainter(self.pixmap1)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.green))
@@ -124,6 +154,10 @@ class window(QtWidgets.QMainWindow):
             self.paint2 = True
             #self.paint1 = False
         if self.paint2 and self.count == 2:
+            if self.pixmap0 != self.pixmap:
+                self.count = -1
+                self.ui.t2Plot.clear()
+                self.ui.t1Plot.clear()
             painter = QtGui.QPainter(self.pixmap2)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.blue))
@@ -137,6 +171,10 @@ class window(QtWidgets.QMainWindow):
             self.paint3 = True
             #self.paint2 = False
         if self.paint3 and self.count == 3:
+            if self.pixmap0 != self.pixmap:
+                self.count = -1
+                self.ui.t2Plot.clear()
+                self.ui.t1Plot.clear()
             painter = QtGui.QPainter(self.pixmap3)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.yellow))
@@ -150,6 +188,10 @@ class window(QtWidgets.QMainWindow):
             self.paint4 = True
             #self.paint3 = False     
         if self.paint4 and self.count == 4:
+            if self.pixmap0 != self.pixmap:
+                self.count = -1
+                self.ui.t2Plot.clear()
+                self.ui.t1Plot.clear()
             painter = QtGui.QPainter(self.pixmap4)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.darkGray))
@@ -165,6 +207,10 @@ class window(QtWidgets.QMainWindow):
 
 
         if self.count == 5:
+            if self.pixmap0 != self.pixmap:
+                self.count = -1
+                self.ui.t2Plot.clear()
+                self.ui.t1Plot.clear()
             pixmap = QtGui.QPixmap(self.fileName)
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(pixmap) # Set the pixmap onto the label
