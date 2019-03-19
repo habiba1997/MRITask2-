@@ -317,8 +317,11 @@ class window(QtWidgets.QMainWindow):
     def createT1AndT2ArrayForCombBox(self):
         for i in range(self.img.shape[0]):
             for j in range(self.img.shape[1]):
-                T1[i,j]=createT1(self.img[i,j])
-                T2[i,j]=createT2(self.img[i,j])
+                self.T1[i,j]=mappingT1( createT1(self.img[i,j]))
+                self.T2[i,j]=mappingT2(  createT2(self.img[i,j]))
+        
+        
+
 
     def rotationAroundYaxisMatrix(self,theta,vector):
             vector = vector.transpose()
