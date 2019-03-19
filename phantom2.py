@@ -89,12 +89,12 @@ def createT2(intensity):
 
     return T2
 
-
-
-for i in range(self.img.shape[0]):
-    for j in range(self.img.shape[1]):
-        T1[i,j]=createT1(self.img[i,j])
-        T2[i,j]=createT2(self.img[i,j])
+ #scipy.io.savemat(file_name, mdict, appendmat=True, format='5', long_field_names=False, do_compression=False, oned_as='row')
+import scipy.io
+output = {
+		"iphone" : img
+	}
+scipy.io.savemat('phantomOne', output)
 
 
 
@@ -104,10 +104,7 @@ for i in range(self.img.shape[0]):
 #print(img.shape)
 plt.imshow(img, cmap="gray")
 plt.show()
-plt.imshow(T1, cmap="gray")
-plt.show()
-plt.imshow(T2, cmap="gray")
-plt.show()
+
 
 #import csv
 #w = csv.writer(open("output.csv", "w"))
