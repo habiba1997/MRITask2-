@@ -317,8 +317,8 @@ class window(QtWidgets.QMainWindow):
     def createT1AndT2ArrayForCombBox(self):
         for i in range(self.img.shape[0]):
             for j in range(self.img.shape[1]):
-                self.T1[i,j]=mappingT1( createT1(self.img[i,j]))
-                self.T2[i,j]=mappingT2(  createT2(self.img[i,j]))
+                self.T1[i,j]=self.mappingT1( self.createT1(self.img[i,j]))
+                self.T2[i,j]=self.mappingT2( self.createT2(self.img[i,j]))
         
         
 
