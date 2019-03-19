@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QFileDialog
 from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen
 from PyQt5.QtCore import Qt
 from task2_gui import Ui_MainWindow
-import pyqtgraph as pg
 
 
         
@@ -51,9 +50,9 @@ class window(QtWidgets.QMainWindow):
             self.pixmap = QtGui.QPixmap(self.fileName)
             #self.pixmap = self.pixmap.scaled(180,180)
 
-        if self.text == '180':
+        if self.text == '120':
             self.pixmap = QtGui.QPixmap(self.fileName)
-            self.pixmap = self.pixmap.scaled(180,180)
+            self.pixmap = self.pixmap.scaled(120,120)
             print('sa7')
 
     def clearGraphicView(self):
@@ -82,11 +81,11 @@ class window(QtWidgets.QMainWindow):
         self.update()
 
     def getPixel(self, event):
+            self.x = event.pos().x()
+            self.y = event.pos().y()
             self.T1 = self.createT1(self.img[self.x,self.y])
             self.T2 = self.createT2(self.img[self.x,self.y])
             self.PD = self.createPD(self.img[self.x,self.y])
-            self.x = event.pos().x()
-            self.y = event.pos().y()
             self.count += 1
             print(self.img[self.x, self.y])
             self.plot()
@@ -210,10 +209,11 @@ class window(QtWidgets.QMainWindow):
 
     def plot(self):
         
+        print('sa7')
         self.DecayMx = self.ui.decayMx
         self.DecayMy = self.ui.decayMy
         self.RecoveryMz = self.ui.recoveryMz
-
+        
 
         self.theta = ((float) (self.ui.rotationAngle.text())) #5ly balk not global 
         self.Tr = ((float) (self.ui.tr.text()))
@@ -225,7 +225,7 @@ class window(QtWidgets.QMainWindow):
         self.Mx = []
         self.My = []
         self.Mz =[]
-        
+        self.vector= np.matrix ([0,0,1]) #da range sabt
         self.vector = self.rotationAroundYaxisMatrix(self.theta,self.vector)
 
         for i in range(len(self.time)):
@@ -237,7 +237,6 @@ class window(QtWidgets.QMainWindow):
             self.Mz = np.append(self.Mz,self.vector.item(2))
         
     
-
         self.DecayMx.plot(self.time,np.ravel(self.Mx))
         self.DecayMy.plot(self.time,np.ravel(self.My))
         self.RecoveryMz.plot(self.time,np.ravel(self.Mz))
@@ -317,8 +316,8 @@ class window(QtWidgets.QMainWindow):
     def createT1AndT2ArrayForCombBox(self):
         for i in range(self.img.shape[0]):
             for j in range(self.img.shape[1]):
-                self.T1[i,j]=mappingT1( createT1(self.img[i,j]))
-                self.T2[i,j]=mappingT2(  createT2(self.img[i,j]))
+                self.T1[i,j]=self.mappingT1( self.createT1(self.img[i,j]))
+                self.T2[i,j]=self.mappingT2( self.createT2(self.img[i,j]))
         
         
 

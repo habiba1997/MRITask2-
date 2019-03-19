@@ -234,7 +234,7 @@ class Ui_MainWindow(object):
         self.ImageChange.setItemText(2, _translate("MainWindow", "T2"))
         self.comboBox.setCurrentText(_translate("MainWindow", "520"))
         self.comboBox.setItemText(0, _translate("MainWindow", "520"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "180"))
+        self.comboBox.setItemText(1, _translate("MainWindow", "120"))
         self.label_10.setText(_translate("MainWindow", "Decay In X axis"))
         self.label_3.setText(_translate("MainWindow", "Flip Angle"))
         self.label_12.setText(_translate("MainWindow", "Recovery In Z axis"))
@@ -249,12 +249,4 @@ class Ui_MainWindow(object):
 
 from pyqtgraph import PlotWidget
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 
