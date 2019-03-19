@@ -56,6 +56,10 @@ class window(QtWidgets.QMainWindow):
             self.pixmap = self.pixmap.scaled(180,180)
             print('sa7')
 
+    def clearGraphicView(self):
+        self.ui.decayMx.clear()
+        self.ui.recoveryMz.clear()
+        self.ui.decayMy.clear()
 
     def setImage(self):
         self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)") # Ask for file
@@ -105,8 +109,7 @@ class window(QtWidgets.QMainWindow):
             #pixmap = QtGui.QPixmap(self.fileName) # Setup pixmap with the provided image
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.decayMx.clear()
-                self.ui.recoveryMz.clear()
+                self.clearGraphicView()
             painter = QtGui.QPainter(self.pixmap0)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             pen = QtGui.QPen(QtCore.Qt.red)
@@ -126,8 +129,7 @@ class window(QtWidgets.QMainWindow):
         if  self.paint1 and self.count == 1:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.decayMx.clear()
-                self.ui.recoveryMz.clear()
+                self.clearGraphicView()
             painter = QtGui.QPainter(self.pixmap1)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.green))
@@ -144,8 +146,7 @@ class window(QtWidgets.QMainWindow):
         if self.paint2 and self.count == 2:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.decayMx.clear()
-                self.ui.recoveryMz.clear()
+                self.clearGraphicView()
             painter = QtGui.QPainter(self.pixmap2)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.blue))
@@ -162,8 +163,7 @@ class window(QtWidgets.QMainWindow):
         if self.paint3 and self.count == 3:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.decayMx.clear()
-                self.ui.recoveryMz.clear()
+                self.clearGraphicView()
             painter = QtGui.QPainter(self.pixmap3)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.yellow))
@@ -180,8 +180,7 @@ class window(QtWidgets.QMainWindow):
         if self.paint4 and self.count == 4:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.decayMx.clear()
-                self.ui.recoveryMz.clear()
+                self.clearGraphicView()
             painter = QtGui.QPainter(self.pixmap4)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.darkGray))
@@ -206,8 +205,7 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show()
             self.count = -1
             self.paint = True
-            self.ui.decayMx.clear()
-            self.ui.recoveryMz.clear()
+            self.clearGraphicView()
 
 
     def plot(self):
@@ -316,7 +314,11 @@ class window(QtWidgets.QMainWindow):
 
         return T2
 
-
+    def createT1AndT2ArrayForCombBox(self):
+        for i in range(self.img.shape[0]):
+            for j in range(self.img.shape[1]):
+                T1[i,j]=createT1(self.img[i,j])
+                T2[i,j]=createT2(self.img[i,j])
 
     def rotationAroundYaxisMatrix(self,theta,vector):
             vector = vector.transpose()

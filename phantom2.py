@@ -91,10 +91,10 @@ def createT2(intensity):
 
 
 
-for i in range(img.shape[0]):
-    for j in range(img.shape[1]):
-        T1[i,j]=createT1(img[i,j])
-        T2[i,j]=createT2(img[i,j])
+for i in range(self.img.shape[0]):
+    for j in range(self.img.shape[1]):
+        T1[i,j]=createT1(self.img[i,j])
+        T2[i,j]=createT2(self.img[i,j])
 
 
 
