@@ -22,53 +22,36 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.T2 = self.createT2(pixelIntensity)
         self.PD = self.createPD(pixelIntensity)
         
-        #self.ui.rotationAngle.textChanged.connect(self.plot)  #any change in lineEdit text
+        self.ui.rotationAngle.textChanged.connect(self.plot)  #any change in lineEdit text
        
-        #self.ui.te.textChanged.connect(self.plot)  #any change in lineEdit text
-        #self.ui.tr.textChanged.connect(self.plot)  #any change in lineEdit text
+        self.ui.te.textChanged.connect(self.plot)  #any change in lineEdit text
+        self.ui.tr.textChanged.connect(self.plot)  #any change in lineEdit text
        
         self.ui.Plot.clicked.connect(self.plot)
-        
     
-
-    
-
     def plot(self):
-<<<<<<< HEAD
-        DecayMx = self.ui.decayMx
-        #DecayMy = self.ui.decayMy
-        RecoveryMz = self.ui.recoveryMz
-
-        DecayMx.clear()
-        #DecayMy.clear()
-        RecoveryMz.clear()
-=======
+        self.ui.decayMx.clear()
+        self.ui.decayMy.clear()
+        self.ui.recoveryMz.clear()
         
         self.DecayMx = self.ui.decayMx
         self.DecayMy = self.ui.decayMy
         self.RecoveryMz = self.ui.recoveryMz
 
-        self.ui.decayMx.clear()
-        self.ui.decayMy.clear()
-        self.ui.recoveryMz.clear()
->>>>>>> 0d19d8395b6dad5cf7a9d2996ac6720495b607f8
 
-        theta = ((float) (self.ui.rotationAngle.text())) #5ly balk not global
-        vector = self.rotationAroundYaxisMatrix(theta,self.vector)
-        RecoveryDecayMatrix = self.recoveryDecayEquation(self.T1,self.T2,self.PD,vector)
-<<<<<<< HEAD
+        theta = ((float) (self.ui.rotationAngle.text())) #5ly balk not global 
+        #self.Tr = ((float) (self.ui.tr.text()))
+        #self.Te = ((float) (self.ui.te.text()))
+        
+        RecoveryDecayMatrix = self.rotationAroundYaxisMatrix(90,self.vector)
+        RecoveryDecayMatrix = self.rotationAroundZaxisMatrixXY(1,1,RecoveryDecayMatrix)
+        RecoveryDecayMatrix = self.recoveryDecayEquation(self.T1,self.T2,self.PD,RecoveryDecayMatrix)
    
-        DecayMx.plot(self.time,np.array(RecoveryDecayMatrix[0,:]).ravel())
-        #DecayMy.plot(self.time,np.array(RecoveryDecayMatrix[1,:]).ravel())
-        RecoveryMz.plot(self.time,np.array(RecoveryDecayMatrix[2,:]).ravel())
-
-        #plot.showGrid(x=True, y=True, alpha=1)
-    
-=======
-        self.Tr = ((float) (self.ui.tr.text())) 
-        self.Te = ((float) (self.ui.te.text())) 
->>>>>>> 0d19d8395b6dad5cf7a9d2996ac6720495b607f8
+        self.DecayMx.plot(self.time,np.array(RecoveryDecayMatrix[0,:]).ravel())
+        self.DecayMy.plot(self.time,np.array(RecoveryDecayMatrix[1,:]).ravel())
+        self.RecoveryMz.plot(self.time,np.array(RecoveryDecayMatrix[2,:]).ravel())
        
+        
         self.DecayMx.plot(self.time,np.array(RecoveryDecayMatrix[0,:]).ravel())
         self.DecayMy.plot(self.time,np.array(RecoveryDecayMatrix[1,:]).ravel())
         self.RecoveryMz.plot(self.time,np.array(RecoveryDecayMatrix[2,:]).ravel())
@@ -76,8 +59,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.RecoveryMz.addLine(x=self.Te)
         self.DecayMx.addLine(x=self.Tr)
         self.DecayMx.addLine(x=self.Te)
-        
-        
+
         
     def createPD(self,intensity):
         return (1/255)*intensity 
@@ -97,14 +79,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def mappingT2 (self,T2):  #T1 in msec assumption
         return (T2-20)/2
 
-    def rotationAroundZaxisMatrix(self,theta,vector):
-        vector = vector.transpose()
-        theta = (math.pi / 180) * theta
-        R = np.matrix ([[np.cos(theta),-np.sin(theta),0], [np.sin(theta), np.cos(theta),0]],[0, 0, 1] )
-        R = np.dot(R, vector)
-        R = R.transpose()
-        return np.matrix(R)
-
     def rotationAroundYaxisMatrix(self,theta,vector):
         vector = vector.transpose()
         theta = (math.pi / 180) * theta
@@ -113,8 +87,22 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         R = R.transpose()
         return np.matrix(R)
 
-    def recoveryDecayEquation(self,T1,T2,PD,vector):
+
+    def rotationAroundZaxisMatrixXY(self,TR,speed,vector): #time = self.time
         vector = vector.transpose()
+        XY = [] 
+        for i in range(len(self.time)):
+            theta = speed * (self.time[i]/ TR)* self.time[i]
+            theta = (math.pi / 180) * theta
+            XY = np.append(XY,np.dot([[np.cos(theta),-np.sin(theta),0], [np.sin(theta), np.cos(theta),0],[0, 0, 1]],vector))
+       
+        XY = XY.reshape(len(self.time),3)
+        XY = XY.transpose()
+        return np.matrix(XY) 
+
+
+    def recoveryDecayEquation(self,T1,T2,PD,vector):
+        #vector = vector.transpose()
         Decay =  []
         Rec = []
         for i in range(len(self.time)):

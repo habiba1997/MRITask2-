@@ -41,11 +41,9 @@ class Ui_PlotForm(object):
         self.DecayInMx_3.setObjectName("DecayInMx_3")
         self.tr = QtWidgets.QLineEdit(PlotForm)
         self.tr.setGeometry(QtCore.QRect(350, 600, 151, 31))
-        self.tr.setText("")
         self.tr.setObjectName("tr")
         self.te = QtWidgets.QLineEdit(PlotForm)
         self.te.setGeometry(QtCore.QRect(180, 600, 151, 31))
-        self.te.setText("")
         self.te.setObjectName("te")
 
         self.retranslateUi(PlotForm)
@@ -59,5 +57,7 @@ class Ui_PlotForm(object):
         self.DecayInMx.setText(_translate("PlotForm", "Decay In Mx"))
         self.DecayInMx_2.setText(_translate("PlotForm", "Decay In My"))
         self.DecayInMx_3.setText(_translate("PlotForm", "Recovery In Z"))
+        self.tr.setText(_translate("PlotForm", "1"))
+        self.te.setText(_translate("PlotForm", "0.4"))
 
 from pyqtgraph import PlotWidget
