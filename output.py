@@ -57,7 +57,7 @@ class Ui_PlotForm(object):
         self.DecayInMx.setText(_translate("PlotForm", "Decay In Mx"))
         self.DecayInMx_2.setText(_translate("PlotForm", "Decay In My"))
         self.DecayInMx_3.setText(_translate("PlotForm", "Recovery In Z"))
-        self.tr.setText(_translate("PlotForm", "2"))
-        self.te.setText(_translate("PlotForm", "0.5"))
+        self.tr.setText(_translate("PlotForm", "1"))
+        self.te.setText(_translate("PlotForm", "0.4"))
 
 from pyqtgraph import PlotWidget

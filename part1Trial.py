@@ -17,13 +17,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.time  = np.arange(0,1,0.001) #in sec but step in 1 msec
         self.vector= np.matrix ([0,0,1]) #da range sabt
 
-        pixelIntensity = 1 #depend on pixel choosen
+        pixelIntensity = 255 #depend on pixel choosen
 
         self.T1 = self.createT1(pixelIntensity)
         self.T2 = self.createT2(pixelIntensity)
         self.PD = self.createPD(pixelIntensity)
         
-        self.PD = 1
 
         self.ui.rotationAngle.textChanged.connect(self.plot)  #any change in lineEdit text
        
@@ -52,9 +51,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Mx = []
         self.My = []
         self.Mz =[]
+        
+        self.vector = self.rotationAroundYaxisMatrix(self.theta,self.vector)
 
         for i in range(len(self.time)):
-            self.vector = self.rotationAroundYaxisMatrix(self.theta,self.vector)
             self.vector = self.rotationAroundZaxisMatrixXY(self.Tr,speed,self.vector,self.time[i])
             self.vector = self.recoveryDecayEquation(self.T1,self.T2,self.PD, self.vector,self.time[i])
             
@@ -76,15 +76,16 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         
     def createPD(self,intensity):
         return (1/255)*intensity 
-    
-    def returnIntensity(self,Pd): # proton intensity vales from 0 till 1 
-        return 255*Pd
-    
+        
     def createT1 (self,intensity):
         return ((6*intensity)+500)/1000
 
     def createT2(self,intensity):
         return ((2*intensity)+20)/1000
+    def returnIntensity(self,Pd): # proton intensity vales from 0 till 1 
+        return 255*Pd
+    
+
     
     def mappingT1 (self,T1): #T1 in msec assumption
         return (T1-500)/6
@@ -103,7 +104,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def rotationAroundZaxisMatrixXY(self,TR,speed,vector,time): #time = self.time
             vector = vector.transpose()
-            theta = speed * (time/ TR)* time
+            theta = speed * (time/ TR)
             theta = (math.pi / 180) * theta
             XY = np.matrix([[np.cos(theta),-np.sin(theta),0], [np.sin(theta), np.cos(theta),0],[0, 0, 1]])
             XY = np.dot(XY,vector)

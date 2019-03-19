@@ -37,7 +37,7 @@ img[x5:x5+50, y5:y5+70] = box5
 
 
 # a function that returns T1 ( recovery time ) based on the intensity
-def create_T1(intensity):
+def createT1(intensity):
 
     if intensity == 100: #Gray matter
         T1=900
@@ -64,7 +64,7 @@ def create_T1(intensity):
 
 
 # a function that returns T2 ( decay time ) based on the intensity
-def create_T2(intensity):
+def createT2(intensity):
 
     if intensity == 100: #Gray matter
         T2 =90
@@ -93,36 +93,21 @@ def create_T2(intensity):
 
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        T1[i,j]=create_T1(img[i,j])
-        T2[i,j]=create_T2(img[i,j])
+        T1[i,j]=createT1(img[i,j])
+        T2[i,j]=createT2(img[i,j])
 
 
 
 
 
 
-#plot in gray scale
 #print(img.shape)
-#plt.imshow(img, cmap="gray")
-#plt.show()
-#plt.imshow(phantomm, cmap="gray")
-#plt.show()
-#plt.imshow(T2, cmap="gray")
-#plt.show()
-
-"""l = [ img, T1,T2]
-import pickle
-
-with open("test.txt", "wb") as fp:   #Pickling
-    pickle.dump(l, fp)
-
-with open("test.txt", "rb") as fp:   # Unpickling
-     b = pickle.load(fp)    
-
-t2 = b.pop()
-t1= b.pop()
-phantomm = b.pop
- """
+plt.imshow(img, cmap="gray")
+plt.show()
+plt.imshow(T1, cmap="gray")
+plt.show()
+plt.imshow(T2, cmap="gray")
+plt.show()
 
 #import csv
 #w = csv.writer(open("output.csv", "w"))
