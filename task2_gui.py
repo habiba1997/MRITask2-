@@ -80,7 +80,7 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Flip Angel"))
         self.lineEdit.setText(_translate("MainWindow", "90"))
         self.comboBox.setItemText(0, _translate("MainWindow", "520"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "180"))
+        self.comboBox.setItemText(1, _translate("MainWindow", "120"))
         self.label_2.setText(_translate("MainWindow", "T2"))
         self.label.setText(_translate("MainWindow", "T1"))
         self.browse.setText(_translate("MainWindow", "Browse"))
@@ -89,12 +89,5 @@ class Ui_MainWindow(object):
 
 from pyqtgraph import PlotWidget
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+
 

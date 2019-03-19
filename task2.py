@@ -14,10 +14,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 from PyQt5 import QtCore, QtGui, QtWidgets, QtQuick
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtQuick import QQuickPaintedItem
+#from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QFileDialog
 from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
 from task2_gui import Ui_MainWindow
 
 
@@ -55,9 +55,9 @@ class window(QtWidgets.QMainWindow):
             self.pixmap = QtGui.QPixmap(self.fileName)
             #self.pixmap = self.pixmap.scaled(180,180)
 
-        if self.text == '180':
+        if self.text == '120':
             self.pixmap = QtGui.QPixmap(self.fileName)
-            self.pixmap = self.pixmap.scaled(180,180)
+            self.pixmap = self.pixmap.scaled(120,120)
             print('sa7')
 
 
@@ -107,13 +107,23 @@ class window(QtWidgets.QMainWindow):
             print("Left Button Clicked") 
             
 
+    def eventFilter(self, object, event):
+        if event.type() == QEvent.Enter:
+            print("Mouse is over the label")
+            return True
+        elif event.type() == QEvent.Leave:
+            print("Mouse is not over the label")
+        return False
+
     def paintEvent(self, event):
         if self.paint and self.count == -1:
             self.pixmap0 = self.pixmap
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             self.ui.image.adjustSize()
+            #self.ui.image.resize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
+            self.ui.image.installEventFilter(self)
             self.ui.image.show()
 
         if self.paint and self.count == 0:    
@@ -248,6 +258,7 @@ class window(QtWidgets.QMainWindow):
         return ((6*intensity)+500)/1000
 
     def createT2(self,intensity):
+        
         return ((2*intensity)+20)/1000
 
 
