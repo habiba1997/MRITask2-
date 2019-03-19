@@ -115,7 +115,7 @@ class Ui_MainWindow(object):
         self.label_11.setObjectName("label_11")
         self.gridLayout_2.addWidget(self.label_11, 2, 3, 1, 2)
         self.image = QtWidgets.QLabel(self.tab)
-        self.image.setMaximumSize(QtCore.QSize(520, 520))
+        #self.image.setMaximumSize(QtCore.QSize(520, 520))
         self.image.setText("")
         self.image.setObjectName("image")
         self.gridLayout_2.addWidget(self.image, 1, 0, 12, 2)
