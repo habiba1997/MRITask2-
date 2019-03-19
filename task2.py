@@ -14,10 +14,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 from PyQt5 import QtCore, QtGui, QtWidgets, QtQuick
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtQuick import QQuickPaintedItem
+#from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QFileDialog
 from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
 from task2_gui import Ui_MainWindow
 
 
@@ -31,9 +31,9 @@ class window(QtWidgets.QMainWindow):
         self.time  = np.arange(0, 10,0.001) #in sec but step in 1 msec
         self.vector= np.matrix ([0,0,1]) #da range sabt
 
-        self.DecayMx = self.ui.t2Plot
-        #DecayMy = self.ui.t1Plot
-        self.RecoveryMz = self.ui.t1Plot
+        self.DecayMx = self.ui.decayMx
+        #DecayMy = self.ui.recoveryMz
+        self.RecoveryMz = self.ui.recoveryMz
 
         self.ui.browse.clicked.connect(self.setImage)
         self.show()
@@ -55,9 +55,9 @@ class window(QtWidgets.QMainWindow):
             self.pixmap = QtGui.QPixmap(self.fileName)
             #self.pixmap = self.pixmap.scaled(180,180)
 
-        if self.text == '180':
+        if self.text == '120':
             self.pixmap = QtGui.QPixmap(self.fileName)
-            self.pixmap = self.pixmap.scaled(180,180)
+            self.pixmap = self.pixmap.scaled(120,120)
             print('sa7')
 
 
@@ -68,7 +68,7 @@ class window(QtWidgets.QMainWindow):
             self.img = cv2.imread(self.fileName, 0)
             print(self.img.shape)
             self.ui.image.mousePressEvent = self.getPixel
-            self.ui.lineEdit.textChanged.connect((self.plot))
+            self.ui.rotationAngle.textChanged.connect((self.plot))
             self.paint = True
             self.ui.comboBox.activated.connect(self.getText)
             self.pixmap = QtGui.QPixmap(self.fileName)
@@ -89,12 +89,12 @@ class window(QtWidgets.QMainWindow):
             self.y = event.pos().y()
             self.count += 1
             print(self.img[self.x, self.y])
-            self.DecayMx = self.ui.t2Plot
-            self.RecoveryMz = self.ui.t1Plot
+            self.DecayMx = self.ui.decayMx
+            self.RecoveryMz = self.ui.recoveryMz
 
 
 
-            theta = ((float) (self.ui.lineEdit.text())) #5ly balk not global
+            theta = ((float) (self.ui.rotationAngle.text())) #5ly balk not global
             vector = self.rotationAroundYaxisMatrix(theta,self.vector)
             RecoveryDecayMatrix = self.recoveryDecayEquation(self.T1,self.T2,self.PD,vector)
     
@@ -107,21 +107,31 @@ class window(QtWidgets.QMainWindow):
             print("Left Button Clicked") 
             
 
+    def eventFilter(self, object, event):
+        if event.type() == QEvent.Enter:
+            print("Mouse is over the label")
+            return True
+        elif event.type() == QEvent.Leave:
+            print("Mouse is not over the label")
+        return False
+
     def paintEvent(self, event):
         if self.paint and self.count == -1:
             self.pixmap0 = self.pixmap
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             self.ui.image.adjustSize()
+            #self.ui.image.resize()
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
+            self.ui.image.installEventFilter(self)
             self.ui.image.show()
 
         if self.paint and self.count == 0:    
             #pixmap = QtGui.QPixmap(self.fileName) # Setup pixmap with the provided image
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.t2Plot.clear()
-                self.ui.t1Plot.clear()
+                self.ui.decayMx.clear()
+                self.ui.recoveryMz.clear()
             painter = QtGui.QPainter(self.pixmap0)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             pen = QtGui.QPen(QtCore.Qt.red)
@@ -141,8 +151,8 @@ class window(QtWidgets.QMainWindow):
         if  self.paint1 and self.count == 1:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.t2Plot.clear()
-                self.ui.t1Plot.clear()
+                self.ui.decayMx.clear()
+                self.ui.recoveryMz.clear()
             painter = QtGui.QPainter(self.pixmap1)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.green))
@@ -159,8 +169,8 @@ class window(QtWidgets.QMainWindow):
         if self.paint2 and self.count == 2:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.t2Plot.clear()
-                self.ui.t1Plot.clear()
+                self.ui.decayMx.clear()
+                self.ui.recoveryMz.clear()
             painter = QtGui.QPainter(self.pixmap2)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.blue))
@@ -177,8 +187,8 @@ class window(QtWidgets.QMainWindow):
         if self.paint3 and self.count == 3:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.t2Plot.clear()
-                self.ui.t1Plot.clear()
+                self.ui.decayMx.clear()
+                self.ui.recoveryMz.clear()
             painter = QtGui.QPainter(self.pixmap3)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.yellow))
@@ -195,8 +205,8 @@ class window(QtWidgets.QMainWindow):
         if self.paint4 and self.count == 4:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
-                self.ui.t2Plot.clear()
-                self.ui.t1Plot.clear()
+                self.ui.decayMx.clear()
+                self.ui.recoveryMz.clear()
             painter = QtGui.QPainter(self.pixmap4)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
             painter.setPen(QtGui.QPen(QtCore.Qt.darkGray))
@@ -221,21 +231,21 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show()
             self.count = -1
             self.paint = True
-            self.ui.t2Plot.clear()
-            self.ui.t1Plot.clear()
+            self.ui.decayMx.clear()
+            self.ui.recoveryMz.clear()
 
 
     def plot(self, event):
-        self.DecayMx = self.ui.t2Plot
-        self.RecoveryMz = self.ui.t1Plot
+        self.DecayMx = self.ui.decayMx
+        self.RecoveryMz = self.ui.recoveryMz
 
 
-        theta = ((float) (self.ui.lineEdit.text())) #5ly balk not global
+        theta = ((float) (self.ui.rotationAngle.text())) #5ly balk not global
         vector = self.rotationAroundYaxisMatrix(theta,self.vector)
         RecoveryDecayMatrix = self.recoveryDecayEquation(self.T1,self.T2,self.PD,vector)
    
-        self.ui.t2Plot.clear()
-        self.ui.t1Plot.clear()
+        self.ui.decayMx.clear()
+        self.ui.recoveryMz.clear()
 
         self.DecayMx.plot(self.time,np.array(RecoveryDecayMatrix[0,:]).ravel())
         #DecayMy.plot(self.time,np.array(RecoveryDecayMatrix[1,:]).ravel())
@@ -248,6 +258,7 @@ class window(QtWidgets.QMainWindow):
         return ((6*intensity)+500)/1000
 
     def createT2(self,intensity):
+        
         return ((2*intensity)+20)/1000
 
 
