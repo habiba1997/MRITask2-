@@ -1,5 +1,5 @@
 import numpy as np
-
+import math
 from matplotlib import pyplot as plt
 
 #Generate random array of zeros 512 rows and 512 columns
@@ -7,7 +7,6 @@ from matplotlib import pyplot as plt
 img = np.zeros((512,512))
 T1 = np.zeros((512,512))
 T2 = np.zeros((512,512))
-Kspace = np.zeros(512,512)
 #create white box an array [value] is the no. of values and determine the intensity, reshape it into rows and columns
 
 box1 = np.array([25]*70*50).reshape(70,50)
@@ -59,15 +58,15 @@ def createT1(intensity):
     elif intensity == 25: #protein
         T1=250
         
-    elif intensity == 0: #Black => air
-        T1=0
+    #elif intensity == 0: #Black => air
+    #    T1=1
         
     else: # general case for any phantom whatever its intensity 
         T1 = (7.5*intensity) + 50
 
     return T1
 
-def createPD(self,intensity):
+def createPD(intensity):
         return (1/255)*intensity 
 
 # a function that returns T2 ( decay time ) based on the intensity
@@ -88,11 +87,11 @@ def createT2(intensity):
     elif intensity == 25: #protein       
         T2 = 30
 
-    elif intensity == 0: #Black => air        
-        T2=0
+    #elif intensity == 0: #Black => air        
+    #    T2=0
 
     else: # general case for any phantom whatever its intensity 
-        T2 = 0.5*intensity
+        T2 = 0.5*intensity+10
 
     return T2
 
@@ -155,6 +154,7 @@ start = True
 
 for Ki in range(len(Kspace)):
     #move in each image pixel
+    print('Ki: ',Ki)
     if start :
         for i in range(img.shape[0]):
             for j in range(img.shape[1]):
@@ -168,8 +168,9 @@ for Ki in range(len(Kspace)):
                 signal[i][j] =  signal[i][j] * np.exp(-TE/createT2(img[i,j]))
     # for kspace column
     for Kj in range (len(Kspace)):
-        GxStep = ((2 * math.pi) / Kspace.shape[0]) * Ki
-        GyStep = ((2 * math.pi) / Kspace.shape[1]) * Kj
+        print('Kj: ',Kj)
+        GxStep = ((2 * math.pi) / len(Kspace)) * Ki
+        GyStep = ((2 * math.pi) /len(Kspace)) * Kj
         
         for i in range(img.shape[0]):
             for j in range(img.shape[1]):
@@ -177,13 +178,14 @@ for Ki in range(len(Kspace)):
                 Kspace[Ki][Kj]+=signal[i][j] * np.exp(complex(0,totalTheta))
     
     for i in range(img.shape[0]):
+        print("recover")
         for j in range(img.shape[1]):
             signal[i,j] = recoveryDecayEquation(createT1(img[i,j]),createT2[i,j],createPD[i,j],signal[i][j],TR)
             vector = np.matrix([0,0,1])
             vector= np.ravel(signal[i][j]* vector.transpose())
             signal[i][j] = [[0,0,vector[0]]]
 
-
+print(Kspace)
 
     
 

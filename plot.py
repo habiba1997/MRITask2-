@@ -20,7 +20,7 @@ class window(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.time  = np.arange(0,1,0.001) #in sec but step in 1 msec
+        self.time  = np.arange(0,10,0.001) #in sec but step in 1 msec
         self.vector= np.matrix ([0,0,1]) #da range sabt
 
         #self.DecayMx = self.ui.decayMx
@@ -220,17 +220,16 @@ class window(QtWidgets.QMainWindow):
         self.Te = ((float) (self.ui.te.text()))
         
 
-        speed =1 
-
         self.Mx = []
         self.My = []
         self.Mz =[]
         self.vector= np.matrix ([0,0,1]) #da range sabt
+        
         self.vector = self.rotationAroundYaxisMatrix(self.theta,self.vector)
 
         for i in range(len(self.time)):
-            self.vector = self.rotationAroundZaxisMatrixXY(self.Tr,speed,self.vector,self.time[i])
-            self.vector = self.recoveryDecayEquation(self.T1,self.T2,self.PD, self.vector,self.time[i])
+            #self.vector = self.rotationAroundZaxisMatrixXY(self.Tr,speed,self.vector,self.time[i])
+            self.vector = self.recoveryDecayEquation(self.T1,self.T2,self.PD,self.vector,self.time[i])
             
             self.Mx = np.append(self.Mx,self.vector.item(0))
             self.My = np.append(self.My,self.vector.item(1))
@@ -269,7 +268,7 @@ class window(QtWidgets.QMainWindow):
             T1=250
             
         elif intensity == 0: #Black => air
-            T1=0
+            T1=10
             
         else: # general case for any phantom whatever its intensity 
             T1 = (7.5*intensity) + 50
@@ -306,7 +305,7 @@ class window(QtWidgets.QMainWindow):
             T2 = 30
 
         elif intensity == 0: #Black => air        
-            T2=0
+            T2=1
 
         else: # general case for any phantom whatever its intensity 
             T2 = 0.5*intensity

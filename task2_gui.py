@@ -224,9 +224,9 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.rotationAngle.setText(_translate("MainWindow", "90"))
-        self.te.setText(_translate("MainWindow", "0.4"))
+        self.te.setText(_translate("MainWindow", "0.5"))
         self.browse.setText(_translate("MainWindow", "Browse"))
-        self.tr.setText(_translate("MainWindow", "1"))
+        self.tr.setText(_translate("MainWindow", "5"))
         self.label_9.setText(_translate("MainWindow", "Time Repeat"))
         self.label_5.setText(_translate("MainWindow", "Time to Echo"))
         self.ImageChange.setItemText(0, _translate("MainWindow", "Proton Density"))
