@@ -1,15 +1,38 @@
 import numpy as np
-
+import math
 from matplotlib import pyplot as plt
 
 #Generate random array of zeros 512 rows and 512 columns
 
-img = np.zeros((512,512))
-T1 = np.zeros((512,512))
-T2 = np.zeros((512,512))
-Kspace = np.zeros(512,512)
+#img = np.zeros((512,512))
+#T1 = np.zeros((512,512))
+#T2 = np.zeros((512,512))
 #create white box an array [value] is the no. of values and determine the intensity, reshape it into rows and columns
 
+img = np.zeros((30,30))
+
+box1 = np.array([25]*5*5).reshape(5,5)
+box2 = np.array([200]*2*2).reshape(2,2)
+box3 = np.array([120]*4*4).reshape(4,4)
+
+
+#Generate specific x-y coordinates 
+x1=4
+y1=4
+x2=25
+y2=25
+x3=14
+y3=14
+
+
+#Replace part of original image with white box
+
+img[x1:x1+5, y1:y1+5] = box1
+img[x2:x2+2, y2:y2+2] = box2
+img[x3:x3+4, y3:y3+4] = box3
+
+
+"""
 box1 = np.array([25]*70*50).reshape(70,50)
 box2 = np.array([200]*25*150).reshape(25,150)
 box3 = np.array([120]*100*25).reshape(100,25)
@@ -35,7 +58,7 @@ img[x2:x2+25, y2:y2+150] = box2
 img[x3:x3+100, y3:y3+25] = box3
 img[x4:x4+100, y4:y4+50] = box4
 img[x5:x5+50, y5:y5+70] = box5
-
+"""
 
 
 
@@ -59,15 +82,15 @@ def createT1(intensity):
     elif intensity == 25: #protein
         T1=250
         
-    elif intensity == 0: #Black => air
-        T1=0
+    #elif intensity == 0: #Black => air
+    #    T1=1
         
     else: # general case for any phantom whatever its intensity 
         T1 = (7.5*intensity) + 50
 
     return T1
 
-def createPD(self,intensity):
+def createPD(intensity):
         return (1/255)*intensity 
 
 # a function that returns T2 ( decay time ) based on the intensity
@@ -88,11 +111,11 @@ def createT2(intensity):
     elif intensity == 25: #protein       
         T2 = 30
 
-    elif intensity == 0: #Black => air        
-        T2=0
+    #elif intensity == 0: #Black => air        
+    #    T2=0
 
     else: # general case for any phantom whatever its intensity 
-        T2 = 0.5*intensity
+        T2 = 0.5*intensity+10
 
     return T2
 
@@ -109,9 +132,8 @@ def rotationAroundYaxisMatrix(theta,vector):
             return np.matrix(R)
 
 
-def rotationAroundZaxisMatrixXY(TR,speed,vector,time): #time = self.time
+def rotationAroundZaxisMatrixXY(theta,vector): #time = self.time
             vector = vector.transpose()
-            theta = speed * (time/ TR)
             theta = (math.pi / 180) * theta
             XY = np.matrix([[np.cos(theta),-np.sin(theta),0], [np.sin(theta), np.cos(theta),0],[0, 0, 1]])
             XY = np.dot(XY,vector)
@@ -142,62 +164,88 @@ for i in range(self.img.shape[0]):
         T1[i,j]=createT1(self.img[i,j])
         T2[i,j]=createT2(self.img[i,j])
 """
+
 import pprint
-TE = 0.1
+TE = 0.020
 vector= np.matrix ([0,0,1]) #da range sabt
 theta = 90 
-TR = 1
-Kspace = [[[0 for k in range(3)] for j in range(img.shape[0])] for i in range(img.shape[1])]
+TR = 0.2
+
+import pylab as m
+
+Kspace = m.zeros((30,30),'complex')
 
 signal = [[[0 for k in range(3)] for j in range(img.shape[0])] for i in range(img.shape[1])]
 
 start = True
 
-for Ki in range(len(Kspace)):
+for Ki in range(Kspace.shape[0]):
     #move in each image pixel
+    print('Ki: ',Ki)
     if start :
         for i in range(img.shape[0]):
             for j in range(img.shape[1]):
                 vectorNew = np.dot(vector , createPD(img[i,j]) )
                 signal[i][j] =  rotationAroundYaxisMatrix(theta,vectorNew)
-                signal[i][j] =  signal[i][j] * np.exp(-TE/createT2(img[i,j]))
+                signal[i][j] = recoveryDecayEquation(createT1(img[i,j]),createT2(img[i,j]),createPD(img[i,j]),np.matrix(signal[i][j]),TE)
     else:
         for i in range(img.shape[0]):
             for j in range(img.shape[1]):
-                signal[i][j] =  rotationAroundYaxisMatrix(theta,signal[i][j])
-                signal[i][j] =  signal[i][j] * np.exp(-TE/createT2(img[i,j]))
+                signal[i][j] =  rotationAroundYaxisMatrix(theta,np.matrix(signal[i][j]))
+                signal[i][j] =  recoveryDecayEquation(createT1(img[i,j]),createT2(img[i,j]),createPD(img[i,j]),np.matrix(signal[i][j]),TE)
     # for kspace column
-    for Kj in range (len(Kspace)):
-        GxStep = ((2 * math.pi) / Kspace.shape[0]) * Ki
-        GyStep = ((2 * math.pi) / Kspace.shape[1]) * Kj
+    for Kj in range (Kspace.shape[1]):
+        print('Kj: ',Kj)
+        GxStep = ((2 * math.pi) / Kspace.shape[0]) * Kj
+        GyStep = ((2 * math.pi) /Kspace.shape[1]) * Ki
+        x = 0
+        y = 0 
         
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
-                totalTheta = complex(GyStep,GxStep)
-                Kspace[Ki][Kj]+=signal[i][j] * np.exp(complex(0,totalTheta))
+        for i in range(len(signal)):
+            for j in range(len(signal)):
+                signal[i][j] = rotationAroundZaxisMatrixXY(GxStep,np.matrix(signal[i][j]))
+                signal[i][j] = rotationAroundZaxisMatrixXY(GyStep,np.matrix(signal[i][j]))
+                                
+                x = x + np.ravel(signal[i][j])[0]
+                y = y + np.ravel(signal[i][j])[1]
+        
+        Kspace[Ki,Kj]= complex(x,y)
     
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
-            signal[i,j] = recoveryDecayEquation(createT1(img[i,j]),createT2[i,j],createPD[i,j],signal[i][j],TR)
-            vector = np.matrix([0,0,1])
-            vector= np.ravel(signal[i][j]* vector.transpose())
-            signal[i][j] = [[0,0,vector[0]]]
-
-
-
+            vectorNew = np.dot(np.matrix ([0,0,1]) , createPD(img[i,j]) )
+            signal[i][j] =  rotationAroundYaxisMatrix(theta,vectorNew)
+            signal[i][j] = recoveryDecayEquation(createT1(img[i,j]),createT2(img[i,j]),createPD(img[i,j]),np.matrix(signal[i][j]),TR)
+            signal[i][j] = [[0,0,np.ravel(signal[i][j])[2]]]
+            start = False
+    
+               
+    
+ 
     
 
+print(Kspace)
+print(img)
 
-
-
-
-
-#print(img.shape)
 plt.imshow(img, cmap="gray")
 plt.show()
-plt.imshow(T1, cmap="gray")
+plt.imshow(np.abs(Kspace),cmap="gray" )
 plt.show()
-plt.imshow(T2, cmap="gray")
+
+for i in range (Kspace.shape[0]):
+        Kspace[:,i] = np.fft.ifft(Kspace[:,i])
+        img[:,i] = np.fft.fft(img[:,i])
+
+
+for i in range (Kspace.shape[0]):
+        Kspace[i,:] = np.fft.ifft(Kspace[i,:])
+        img[i,:] = np.fft.fft(img[i,:])
+
+plt.imshow(img, cmap="gray")
 plt.show()
+plt.imshow(np.abs(Kspace),cmap="gray" )
+plt.show() 
+    
+
 
 

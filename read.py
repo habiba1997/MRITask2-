@@ -26,10 +26,15 @@ for i in range(4):
                 vector= np.ravel(distance[i][j]* vector.transpose())
                 distance[i][j] = [[0,0,vector[0]]]
 
-start = False
-
-if start:
-        print("false")
-else:
-        pprint.pprint(distance)
+for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                totalTheta = complex(GyStep,GxStep)
+                x = np.ravel(signal[i][j])[0]
+                y = np.ravel(signal[i][j])[1]
+                z = math.sqrt( (x*x) + (y*y) )
+                #print("Before || Kspace= ", Kspace) 
+                #print(np.exp(complex(0,totalTheta)))
+                Kspace[Ki,Kj]= Kspace[Ki,Kj]+ (z * np.exp(complex(0,totalTheta)))
+                #print("After || Kspace= ", Kspace) 
+               
         
