@@ -10,7 +10,7 @@ output = {
 scipy.io.savemat('phantomOne', output)
 """
 
-output = sio.loadmat ('phantomOne.mat')
+output = sio.loadmat ('E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantomOne.mat')
 
 img = output['iphone']
 
