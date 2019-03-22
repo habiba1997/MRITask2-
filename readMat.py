@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 #Check Line 93 on phantom2.py 
 
 
-output = sio.loadmat ('phantomOne.mat')
+output = sio.loadmat ('E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantomOne.mat')
 
 img = output['Phantom']
 T1 = output['T1']

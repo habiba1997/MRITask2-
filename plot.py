@@ -8,10 +8,12 @@ from matplotlib import pyplot as plt
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QFileDialog
-from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen
+from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen, QDragEnterEvent
 from PyQt5.QtCore import Qt
 from task2_gui import Ui_MainWindow
-
+from PIL import Image
+from imageio import imsave, imread
+import scipy.io as sio
 
         
 
@@ -43,17 +45,37 @@ class window(QtWidgets.QMainWindow):
         self.y = 90
         self.count = -1
         self.text = '520'
+        self.text2 = 'Proton Density'
+        self.T1 = np.zeros((512,512))
+        self.T2 = np.zeros((512,512))
+
+    def getText2(self, index):
+        self.text2 = self.ui.ImageChange.itemText(index)
+        self.changePic()
 
     def getText(self, index):
         self.text = self.ui.comboBox.itemText(index)
-        if self.text == '520':
-            self.pixmap = QtGui.QPixmap(self.fileName)
-            #self.pixmap = self.pixmap.scaled(180,180)
+        self.changePic()
 
-        if self.text == '120':
-            self.pixmap = QtGui.QPixmap(self.fileName)
+    def changePic(self):
+        print(self.text, self.text2)
+        if self.text == '520' and self.text2 == 'Proton Density':
+            self.pixmap = QtGui.QPixmap(self.fileName0)
+        if self.text == '120' and self.text2 == 'Proton Density':
+            self.pixmap = QtGui.QPixmap(self.fileName0)
             self.pixmap = self.pixmap.scaled(120,120)
-            print('sa7')
+        if self.text == '520' and self.text2 == 'T1':
+            self.pixmap = QtGui.QPixmap(self.fileName2)
+        if self.text == '120' and self.text2 == 'T1':
+            self.pixmap = QtGui.QPixmap(self.fileName2)
+            self.pixmap = self.pixmap.scaled(120,120)
+        if self.text == '520' and self.text2 == 'T2':
+            self.pixmap = QtGui.QPixmap(self.fileName3)
+        if self.text == '120' and self.text2 == 'T2':
+            self.pixmap = QtGui.QPixmap(self.fileName3)
+            self.pixmap = self.pixmap.scaled(120,120)
+
+        
 
     def clearGraphicView(self):
         self.ui.decayMx.clear()
@@ -61,17 +83,23 @@ class window(QtWidgets.QMainWindow):
         self.ui.decayMy.clear()
 
     def setImage(self):
-        self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp)") # Ask for file
+        self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp *.mat)") # Ask for file
         if self.fileName: # If the user gives a file
             print(self.fileName)
-            self.img = cv2.imread(self.fileName, 0)
+            output = sio.loadmat (self.fileName)
+            img = output['iphone']
+            img = img.astype(np.uint8)
+            imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png", img)
+            self.fileName0 = 'E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png'
+            self.img = cv2.imread(self.fileName0, 0)
+            self.createT1AndT2ArrayForCombBox()
             print(self.img.shape)
             self.ui.image.mousePressEvent = self.getPixel
             self.ui.rotationAngle.textChanged.connect((self.plot))
             self.paint = True
             self.ui.comboBox.activated.connect(self.getText)
-            self.pixmap = QtGui.QPixmap(self.fileName)
-
+            self.ui.ImageChange.activated.connect(self.getText2)
+            self.pixmap = QtGui.QPixmap(self.fileName0)
 
 
             print(self.img[self.x,self.y])
@@ -81,11 +109,29 @@ class window(QtWidgets.QMainWindow):
         self.update()
 
     def getPixel(self, event):
-            self.x = event.pos().x()
-            self.y = event.pos().y()
-            self.T1 = self.createT1(self.img[self.x,self.y])
-            self.T2 = self.createT2(self.img[self.x,self.y])
-            self.PD = self.createPD(self.img[self.x,self.y])
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
+            if self.text == '520':
+                siz = 520
+                self.x = event.pos().x() * (siz / self.x2)
+                self.y = event.pos().y() * (siz / self.y2)
+                self.x = math.floor(self.x)
+                self.y = math.floor(self.y)
+                self.T1 = self.createT1(self.img[self.x,self.y])
+                self.T2 = self.createT2(self.img[self.x,self.y])
+                self.PD = self.createPD(self.img[self.x,self.y])
+            if self.text == '120':
+                siz = 120
+                self.x0 = event.pos().x()
+                self.y0 = event.pos().y()
+                self.x = self.x0 * (siz / self.x2)
+                self.y = self.y0 * (siz / self.y2)
+                self.x = math.floor(self.x)
+                self.y = math.floor(self.y)
+                self.T1 = self.createT1(self.img[self.x0,self.y0])
+                self.T2 = self.createT2(self.img[self.x0,self.y0])
+                self.PD = self.createPD(self.img[self.x0,self.y0])
+            
             self.count += 1
             print(self.img[self.x, self.y])
             self.plot()
@@ -126,7 +172,7 @@ class window(QtWidgets.QMainWindow):
             self.paint1 = True
 
             #self.paint = False  
-                
+
         if  self.paint1 and self.count == 1:
             if self.pixmap0 != self.pixmap:
                 self.count = -1
@@ -198,13 +244,13 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show()
             #self.paint4 = False
         if self.count == 5:
-            if self.text == '180':
-                self.pixmap = QtGui.QPixmap(self.fileName)
-                self.pixmap = self.pixmap.scaled(180,180)
+            if self.text == '120':
+                self.pixmap = QtGui.QPixmap(self.fileName0)
+                self.pixmap = self.pixmap.scaled(120,120)
             if self.text == '520':
-                self.pixmap = QtGui.QPixmap(self.fileName)
+                self.pixmap = QtGui.QPixmap(self.fileName0)
             #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -216,7 +262,6 @@ class window(QtWidgets.QMainWindow):
 
     def plot(self):
         
-        print('sa7')
         self.DecayMx = self.ui.decayMx
         self.DecayMy = self.ui.decayMy
         self.RecoveryMz = self.ui.recoveryMz
@@ -324,9 +369,16 @@ class window(QtWidgets.QMainWindow):
             for j in range(self.img.shape[1]):
                 self.T1[i,j]=self.mappingT1( self.createT1(self.img[i,j]))
                 self.T2[i,j]=self.mappingT2( self.createT2(self.img[i,j]))
-        
-        
-
+        self.T1 = self.T1.astype(np.uint8)
+        self.T2 = self.T2.astype(np.uint8)
+        img2 = Image.fromarray(self.T2)
+        img = Image.fromarray(self.T1)
+        imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T1.png", img)
+        imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T2.png", img2)
+        self.fileName2 = "E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T1.png"
+        self.fileName3 = "E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T2.png"
+        print(self.fileName2)
+        print(self.fileName3)
 
     def rotationAroundYaxisMatrix(self,theta,vector):
             vector = vector.transpose()
