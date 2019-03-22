@@ -39,55 +39,55 @@ img[x5:x5+50, y5:y5+70] = box5
 # a function that returns T1 ( recovery time ) based on the intensity
 def createT1(intensity):
 
-    if intensity == 100: #Gray matter
-        T1=900
+    #if intensity == 100: #Gray matter
+     #   T1=900
         
-    elif intensity == 255: #white matter
-        T1= 510
+    #elif intensity == 255: #white matter
+     #   T1= 510
        
-    elif intensity == 200: #muscle
-        T1=900
+    #elif intensity == 200: #muscle
+     #   T1=900
        
-    elif intensity == 120 : #fat
-        T1=300
+    #elif intensity == 120 : #fat
+     #   T1=300
         
-    elif intensity == 25: #protein
-        T1=250
+    #elif intensity == 25: #protein
+     #   T1=250
         
-    elif intensity == 0: #Black => air
-        T1=0
+    #elif intensity == 0: #Black => air
+     #   T1=0
         
-    else: # general case for any phantom whatever its intensity 
+    #else: # general case for any phantom whatever its intensity 
         T1 = (7.5*intensity) + 50
 
-    return T1
+        return T1
 
 
 # a function that returns T2 ( decay time ) based on the intensity
 def createT2(intensity):
 
-    if intensity == 100: #Gray matter
-        T2 =90
+    #if intensity == 100: #Gray matter
+     #   T2 =90
    
-    elif intensity == 255: #white matter       
-        T2 =70
+    #elif intensity == 255: #white matter       
+     #   T2 =70
 
-    elif intensity == 200: #muscle        
-        T2 = 50
+    #elif intensity == 200: #muscle        
+     #   T2 = 50
 
-    elif intensity == 120 : #fat        
-        T2 = 100
+    #elif intensity == 120 : #fat        
+     #   T2 = 100
 
-    elif intensity == 25: #protein       
-        T2 = 30
+    #elif intensity == 25: #protein       
+     #   T2 = 30
 
-    elif intensity == 0: #Black => air        
-        T2=0
+    #elif intensity == 0: #Black => air        
+     #   T2=0
 
-    else: # general case for any phantom whatever its intensity 
+    #else: # general case for any phantom whatever its intensity 
         T2 = 0.5*intensity
 
-    return T2
+        return T2
 
  #scipy.io.savemat(file_name, mdict, appendmat=True, format='5', long_field_names=False, do_compression=False, oned_as='row')
 import scipy.io

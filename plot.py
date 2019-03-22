@@ -11,9 +11,11 @@ from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QFileDialog
 from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen, QDragEnterEvent
 from PyQt5.QtCore import Qt
 from task2_gui import Ui_MainWindow
-from PIL import Image
+from PIL import Image, ImageEnhance
 from imageio import imsave, imread
 import scipy.io as sio
+import io
+from time import sleep
 
         
 
@@ -29,7 +31,6 @@ class window(QtWidgets.QMainWindow):
         #self.RecoveryMz = self.ui.recoveryMz
                
         self.DecayMx = self.ui.decayMx
-        self.DecayMy = self.ui.decayMy
         self.RecoveryMz = self.ui.recoveryMz
 
         self.ui.browse.clicked.connect(self.setImage)
@@ -80,7 +81,6 @@ class window(QtWidgets.QMainWindow):
     def clearGraphicView(self):
         self.ui.decayMx.clear()
         self.ui.recoveryMz.clear()
-        self.ui.decayMy.clear()
 
     def setImage(self):
         self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp *.mat)") # Ask for file
@@ -94,7 +94,9 @@ class window(QtWidgets.QMainWindow):
             self.img = cv2.imread(self.fileName0, 0)
             self.createT1AndT2ArrayForCombBox()
             print(self.img.shape)
+            self.ui.image.setMouseTracking(False)
             self.ui.image.mousePressEvent = self.getPixel
+            self.ui.image.mouseMoveEvent = self.changeCont
             self.ui.rotationAngle.textChanged.connect((self.plot))
             self.paint = True
             self.ui.comboBox.activated.connect(self.getText)
@@ -103,6 +105,19 @@ class window(QtWidgets.QMainWindow):
 
 
             print(self.img[self.x,self.y])
+
+
+    def changeCont(self, event):
+        if self.ui.checkBox.isChecked():
+                image1 = Image.open(self.fileName0)
+                enhancer = ImageEnhance.Brightness(image1)
+                enhanced_img = enhancer.enhance(self.x)
+                enhanced_img.save('E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\enhanced_img.png')
+                self.fileName4 = 'E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\enhanced_img.png'
+                self.pixmap5 = QtGui.QPixmap(self.fileName4)
+                self.ui.image.setPixmap(self.pixmap5)
+                print('sa7')
+                sleep(0.05)
 
     def mousePressEvent(self, e):
         self.points << e.pos()
@@ -131,18 +146,18 @@ class window(QtWidgets.QMainWindow):
                 self.T1 = self.createT1(self.img[self.x0,self.y0])
                 self.T2 = self.createT2(self.img[self.x0,self.y0])
                 self.PD = self.createPD(self.img[self.x0,self.y0])
-            
-            self.count += 1
-            print(self.img[self.x, self.y])
-            self.plot()
-            #print(self.count)
-            #print(self.x, self.y)
-            print(self.paint,"paint1:", self.paint1,"paint2:", self.paint2,"paint3:", self.paint3,"paint4:", self.paint4)
-            print("Left Button Clicked") 
-            
+            if not self.ui.checkBox.isChecked():
+                self.count += 1
+                print(self.img[self.x, self.y])
+                self.plot()
+                #print(self.count)
+                #print(self.x, self.y)
+                print(self.paint,"paint1:", self.paint1,"paint2:", self.paint2,"paint3:", self.paint3,"paint4:", self.paint4)
+                print("Left Button Clicked") 
+                
 
     def paintEvent(self, event):
-        if self.paint and self.count == -1:
+        if self.paint and self.count == -1 and not self.ui.checkBox.isChecked():
             self.pixmap0 = self.pixmap
             #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
@@ -151,7 +166,7 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
 
-        if self.paint and self.count == 0:    
+        if self.paint and self.count == 0 and not self.ui.checkBox.isChecked():    
             #pixmap = QtGui.QPixmap(self.fileName) # Setup pixmap with the provided image
             if self.pixmap0 != self.pixmap:
                 self.count = -1
@@ -173,7 +188,7 @@ class window(QtWidgets.QMainWindow):
 
             #self.paint = False  
 
-        if  self.paint1 and self.count == 1:
+        if  self.paint1 and self.count == 1 and not self.ui.checkBox.isChecked():
             if self.pixmap0 != self.pixmap:
                 self.count = -1
                 self.clearGraphicView()
@@ -191,7 +206,7 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show()
             self.paint2 = True
             #self.paint1 = False
-        if self.paint2 and self.count == 2:
+        if self.paint2 and self.count == 2 and not self.ui.checkBox.isChecked():
             if self.pixmap0 != self.pixmap:
                 self.count = -1
                 self.clearGraphicView()
@@ -209,7 +224,7 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show() 
             self.paint3 = True
             #self.paint2 = False
-        if self.paint3 and self.count == 3:
+        if self.paint3 and self.count == 3 and not self.ui.checkBox.isChecked():
             if self.pixmap0 != self.pixmap:
                 self.count = -1
                 self.clearGraphicView()
@@ -227,7 +242,7 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show()    
             self.paint4 = True
             #self.paint3 = False     
-        if self.paint4 and self.count == 4:
+        if self.paint4 and self.count == 4 and not self.ui.checkBox.isChecked():
             if self.pixmap0 != self.pixmap:
                 self.count = -1
                 self.clearGraphicView()
@@ -243,7 +258,7 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             #self.paint4 = False
-        if self.count == 5:
+        if self.count == 5 and not self.ui.checkBox.isChecked():
             if self.text == '120':
                 self.pixmap = QtGui.QPixmap(self.fileName0)
                 self.pixmap = self.pixmap.scaled(120,120)
@@ -263,7 +278,6 @@ class window(QtWidgets.QMainWindow):
     def plot(self):
         
         self.DecayMx = self.ui.decayMx
-        self.DecayMy = self.ui.decayMy
         self.RecoveryMz = self.ui.recoveryMz
         
 
@@ -273,7 +287,6 @@ class window(QtWidgets.QMainWindow):
         
 
         self.Mx = []
-        self.My = []
         self.Mz =[]
         self.vector= np.matrix ([0,0,1]) #da range sabt
         
@@ -284,12 +297,10 @@ class window(QtWidgets.QMainWindow):
             self.vector = self.recoveryDecayEquation(self.T1,self.T2,self.PD,self.vector,self.time[i])
             
             self.Mx = np.append(self.Mx,self.vector.item(0))
-            self.My = np.append(self.My,self.vector.item(1))
             self.Mz = np.append(self.Mz,self.vector.item(2))
         
     
         self.DecayMx.plot(self.time,np.ravel(self.Mx))
-        self.DecayMy.plot(self.time,np.ravel(self.My))
         self.RecoveryMz.plot(self.time,np.ravel(self.Mz))
 
         self.RecoveryMz.addLine(x=self.Tr)
@@ -304,28 +315,10 @@ class window(QtWidgets.QMainWindow):
 
     def createT1(self,intensity):
 
-        if intensity == 100: #Gray matter
-            T1=900
-            
-        elif intensity == 255: #white matter
-            T1= 510
-        
-        elif intensity == 200: #muscle
-            T1=900
-        
-        elif intensity == 120 : #fat
-            T1=300
-            
-        elif intensity == 25: #protein
-            T1=250
-            
-        elif intensity == 0: #Black => air
-            T1=10
-            
-        else: # general case for any phantom whatever its intensity 
+      
             T1 = (7.5*intensity) + 50
 
-        return T1
+            return T1
 
     def returnIntensityfromProtonDensity(self,Pd): # proton intensity vales from 0 till 1 
         return 255*Pd
@@ -341,28 +334,10 @@ class window(QtWidgets.QMainWindow):
     # a function that returns T2 ( decay time ) based on the intensity
     def createT2(self,intensity):
 
-        if intensity == 100: #Gray matter
-            T2 =90
-    
-        elif intensity == 255: #white matter       
-            T2 =70
-
-        elif intensity == 200: #muscle        
-            T2 = 50
-
-        elif intensity == 120 : #fat        
-            T2 = 100
-
-        elif intensity == 25: #protein       
-            T2 = 30
-
-        elif intensity == 0: #Black => air        
-            T2=1
-
-        else: # general case for any phantom whatever its intensity 
+        
             T2 = 0.5*intensity
 
-        return T2
+            return T2
 
     def createT1AndT2ArrayForCombBox(self):
         for i in range(self.img.shape[0]):
