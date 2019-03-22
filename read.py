@@ -36,5 +36,32 @@ for i in range(img.shape[0]):
                 #print(np.exp(complex(0,totalTheta)))
                 Kspace[Ki,Kj]= Kspace[Ki,Kj]+ (z * np.exp(complex(0,totalTheta)))
                 #print("After || Kspace= ", Kspace) 
-               
+
+"""
+        x = 0
+        y = 0 
         
+        for i in range(len(signal)):
+            for j in range(len(signal)):
+                signal[i][j] = rotationAroundZaxisMatrixXY(GxStep,np.matrix(signal[i][j]))
+                signal[i][j] = rotationAroundZaxisMatrixXY(GyStep,np.matrix(signal[i][j]))
+                                
+                x = x + np.ravel(signal[i][j])[0]
+                y = y + np.ravel(signal[i][j])[1]
+        
+        Kspace[Ki,Kj]= complex(x,y)          
+"""        
+
+"""
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                print("signal: ", signal[i][j])
+                totalTheta = complex(GyStep,GxStep)
+                print("totalTheta: ", totalTheta)
+                z = abs(complex(np.ravel(signal[i][j])[0],np.ravel(signal[i][j])[1]))
+                print("Before || Kspace= ", Kspace) 
+                print("absolute:",z* np.exp(complex(0,totalTheta)))
+                Kspace[Ki,Kj]= Kspace[Ki,Kj] + (float)(z * np.exp(complex(0,totalTheta)))
+                print("After || Kspace= ", Kspace) 
+"""
+    

@@ -87,12 +87,27 @@ def createT2(intensity):
     #else: # general case for any phantom whatever its intensity 
         T2 = 0.5*intensity
 
+<<<<<<< HEAD
         return T2
+=======
+    return T2
+T1 = np.zeros((512,512))
+T2= np.zeros((512,512))
 
- #scipy.io.savemat(file_name, mdict, appendmat=True, format='5', long_field_names=False, do_compression=False, oned_as='row')
+
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+        T1[i,j]=createT1(img[i,j])
+        T2[i,j]=createT2(img[i,j])
+
+>>>>>>> 63b1e1ee73f4a1b3c9c04e3fbfd8d0ad5d2a315a
+
 import scipy.io
+
 output = {
-		"iphone" : img
+		"Phantom" : img,
+        "T1": T1,
+        "T2":T2,
 	}
 scipy.io.savemat('phantomOne', output)
 
@@ -101,20 +116,7 @@ scipy.io.savemat('phantomOne', output)
 
 
 
-#print(img.shape)
 plt.imshow(img, cmap="gray")
 plt.show()
 
 
-#import csv
-#w = csv.writer(open("output.csv", "w"))
-#for key, val in output.items():
-#    w.writerow([key, val])
-
-#f = open("dict.txt","w")
-#f.write( str(output) )
-#f.close()
-
-# numpy.savetxt(fname, X, fmt='%.18e', delimiter=' ', newline='\n', header='', footer='', comments='# ', encoding=None)[source]¶
-
-#np.savetxt('output.txt',img)
