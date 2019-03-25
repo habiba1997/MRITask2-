@@ -60,8 +60,9 @@ def createT2(intensity):
     return T2
 
 
-
-
+#self.pixmap5 = QtGui.QPixmap(self.fileName4)
+#                self.ui.image.setPixmap(self.pixmap5)
+# self.img[self.x, self.y]
 
 def rotationAroundYaxisMatrix(theta,vector):
             vector = vector.transpose()

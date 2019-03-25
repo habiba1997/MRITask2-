@@ -2,7 +2,6 @@
 import numpy as np
 
 from matplotlib import pyplot as plt
-from imageio import imsave, imread
 from PIL import Image
 
 #Generate random array of zeros 512 rows and 512 columns
@@ -38,55 +37,53 @@ img[x3:x3+125, y3:y3+125] = box3
 img[x4:x4+250, y4:y4+250] = box4
 img[x5:x5+300, y5:y5+300] = box5
 
-
 # a function that returns T1 ( recovery time ) based on the intensity
-def create_T1(intensity):
+def createT1(intensity):
 
-    if intensity == 255: #Gray matter
-        T1=900
+    if intensity == 100: #Gray matter
+       T1=900
         
-    elif intensity == 125: #white matter
-        T1= 510
+    elif intensity == 255: #white matter
+       T1= 510
        
     elif intensity == 200: #muscle
-        T1=900
+       T1=900
        
-    elif intensity == 150 : #fat
+    elif intensity == 120 : #fat
         T1=300
         
-    elif intensity == 50: #protein
+    elif intensity == 25: #protein
         T1=250
         
     elif intensity == 0: #Black => air
-        T1=0
+       T1=0
         
- # general case for any phantom whatever its intensity - el equation ana alft-ha based on eny ma5rogsh mn el limits - a3tqd en dah msh mkanha msh fy el file bta3 el phantom nfso l2n el intensities gowah limited by which was created 
-    else:
+    else: # general case for any phantom whatever its intensity 
         T1 = (7.5*intensity) + 50
 
     return T1
 
 
 # a function that returns T2 ( decay time ) based on the intensity
-def create_T2(intensity):
+def createT2(intensity):
 
-    if intensity == 255: #Gray matter
+    if intensity == 100: #Gray matter
         T2 =90
    
-    elif intensity == 125: #white matter       
+    elif intensity == 255: #white matter       
         T2 =70
 
     elif intensity == 200: #muscle        
         T2 = 50
 
-    elif intensity == 150 : #fat        
+    elif intensity == 120 : #fat        
         T2 = 100
 
-    elif intensity == 50: #protein       
+    elif intensity == 25: #protein       
         T2 = 30
 
     elif intensity == 0: #Black => air        
-        T2=0
+       T2=0
 
     else: # general case for any phantom whatever its intensity 
         T2 = 0.5*intensity
@@ -94,16 +91,25 @@ def create_T2(intensity):
     return T2
 
 
+def mappingT1 (T1): #T1 in msec assumption
+        return (T1-500)/6
+
+def mappingT2 (T2):  #T1 in msec assumption
+        return (T2-20)/2
+
+T1 = np.zeros((512,512))
+T2= np.zeros((512,512))
+
 
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        T1[i,j]=create_T1(img[i,j])
-        T2[i,j]=create_T2(img[i,j])
+        T1[i,j]=mappingT1(createT1(img[i,j]))
+        T2[i,j]=mappingT2(createT2(img[i,j]))
 
 
+import scipy.io
 
-
-
+<<<<<<< HEAD
 #plot in gray scale
 <<<<<<< HEAD
 img = img.astype(np.uint8)
@@ -113,9 +119,16 @@ plt.imshow(img2, cmap="gray")
 plt.show()
 print(img2)
 =======
+=======
+output = {
+		"Phantom" : img,
+        "T1": T1,
+        "T2":T2,
+	}
+scipy.io.savemat('phantomTwo', output)
+>>>>>>> 4793b4681d5519420b0a62775d23b1d1d429c841
 
-#plt.imshow(img, cmap="gray")
-#plt.show()
->>>>>>> 0d19d8395b6dad5cf7a9d2996ac6720495b607f8
 
 
+plt.imshow(img, cmap="gray")
+plt.show()
