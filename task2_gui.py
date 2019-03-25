@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import math
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -75,8 +76,8 @@ class Ui_MainWindow(object):
         self.label_10.setAlignment(QtCore.Qt.AlignCenter)
         self.label_10.setObjectName("label_10")
         self.gridLayout_2.addWidget(self.label_10, 0, 3, 1, 3)
-        self.image = QtWidgets.QLabel(self.tab)
-        self.image.setMaximumSize(QtCore.QSize(520, 520))
+        self.image = Label(self.centralwidget)
+        self.image.setMaximumSize(QtCore.QSize(512, 512))
         self.image.setText("")
         self.image.setObjectName("image")
         self.gridLayout_2.addWidget(self.image, 1, 0, 10, 2)
@@ -222,8 +223,8 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "Flip Angle"))
         self.label_10.setText(_translate("MainWindow", "Decay In X axis"))
         self.rotationAngle.setText(_translate("MainWindow", "90"))
-        self.comboBox.setCurrentText(_translate("MainWindow", "520"))
-        self.comboBox.setItemText(0, _translate("MainWindow", "520"))
+        self.comboBox.setCurrentText(_translate("MainWindow", "512"))
+        self.comboBox.setItemText(0, _translate("MainWindow", "512"))
         self.comboBox.setItemText(1, _translate("MainWindow", "120"))
         self.ImageChange.setItemText(0, _translate("MainWindow", "Proton Density"))
         self.ImageChange.setItemText(1, _translate("MainWindow", "T1"))
@@ -240,12 +241,21 @@ class Ui_MainWindow(object):
 
 from pyqtgraph import PlotWidget
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
-
+class Label(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        super(Label, self).__init__(parent=parent)
+        self.paint = False
+        self.paint1 = False
+        self.x = 0
+        self.y = 0
+        self.count = 0
+        self.point = []
+        self.pixel = []
+    def paintEvent(self, e):
+        super().paintEvent(e)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        if self.paint:
+            for self.pixel in self.point:
+                painter.setPen(self.pixel[2])
+                painter.drawEllipse(self.pixel[0], self.pixel[1], 8, 8)

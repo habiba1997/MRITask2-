@@ -111,6 +111,7 @@ imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png",
 img2 = imread("phantom1.png")
 plt.imshow(img2, cmap="gray")
 plt.show()
+print(img2)
 =======
 
 #plt.imshow(img, cmap="gray")
