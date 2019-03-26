@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
-    <height>533</height>
+    <width>1602</width>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,106 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
+     <widget class="QLabel" name="image">
+      <property name="minimumSize">
+       <size>
+        <width>512</width>
+        <height>512</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>512</width>
+        <height>512</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QComboBox" name="ImageChange">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <item>
+       <property name="text">
+        <string>Proton Density</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>T1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>T2</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QComboBox" name="comboBox">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="currentText">
+       <string>512</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>512</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>120</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QCheckBox" name="checkBox">
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Brightness</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QPushButton" name="browse">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Browse</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="6">
      <widget class="QTabWidget" name="tabWidget">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="currentIndex">
        <number>1</number>
       </property>
@@ -25,125 +124,14 @@
         <string>Phantom Features</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="14" column="3">
-         <widget class="QLabel" name="label_9">
-          <property name="font">
-           <font>
-            <family>STIX</family>
-            <pointsize>16</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Time Repeat</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="browse">
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Browse</string>
-          </property>
-         </widget>
-        </item>
-        <item row="15" column="3">
+        <item row="17" column="3">
          <widget class="QLineEdit" name="tr">
           <property name="text">
            <string>1</string>
           </property>
          </widget>
         </item>
-        <item row="15" column="1">
-         <widget class="QLineEdit" name="te">
-          <property name="text">
-           <string>0.4</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" colspan="3">
-         <widget class="PlotWidget" name="decayMx"/>
-        </item>
-        <item row="8" column="3">
-         <widget class="QLabel" name="label_12">
-          <property name="font">
-           <font>
-            <family>STIX</family>
-            <pointsize>16</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Recovery In Z axis</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="font">
-           <font>
-            <family>STIX</family>
-            <pointsize>16</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Flip Angle</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" colspan="3">
-         <widget class="QLabel" name="label_10">
-          <property name="font">
-           <font>
-            <family>STIX</family>
-            <pointsize>16</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Decay In X axis</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" rowspan="10" colspan="2">
-         <widget class="QLabel" name="image">
-          <property name="maximumSize">
-           <size>
-            <width>520</width>
-            <height>520</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="2" colspan="4">
-         <widget class="PlotWidget" name="recoveryMz"/>
-        </item>
-        <item row="15" column="0">
+        <item row="17" column="0">
          <widget class="QLineEdit" name="rotationAngle">
           <property name="maximumSize">
            <size>
@@ -156,54 +144,37 @@
           </property>
          </widget>
         </item>
-        <item row="15" column="4">
-         <widget class="QComboBox" name="comboBox">
-          <property name="maximumSize">
-           <size>
-            <width>120</width>
-            <height>16777215</height>
-           </size>
+        <item row="17" column="1">
+         <widget class="QLineEdit" name="te">
+          <property name="text">
+           <string>0.4</string>
           </property>
-          <property name="currentText">
-           <string>520</string>
-          </property>
-          <item>
-           <property name="text">
-            <string>520</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>180</string>
-           </property>
-          </item>
          </widget>
         </item>
-        <item row="14" column="4">
-         <widget class="QComboBox" name="ImageChange">
-          <item>
-           <property name="text">
-            <string>Proton Density</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>T1</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>T2</string>
-           </property>
-          </item>
+        <item row="16" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <family>STIX</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Flip Angle</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
          </widget>
         </item>
-        <item row="14" column="1">
+        <item row="16" column="1">
          <widget class="QLabel" name="label_5">
           <property name="font">
            <font>
             <family>STIX</family>
-            <pointsize>16</pointsize>
+            <pointsize>14</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>
@@ -216,16 +187,77 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox">
+        <item row="11" column="1" colspan="3">
+         <widget class="PlotWidget" name="recoveryMz">
           <property name="maximumSize">
            <size>
-            <width>100</width>
+            <width>600</width>
             <height>16777215</height>
            </size>
           </property>
+         </widget>
+        </item>
+        <item row="16" column="3">
+         <widget class="QLabel" name="label_9">
+          <property name="font">
+           <font>
+            <family>STIX</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="text">
-           <string>Brightness</string>
+           <string>Time Repeat</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="3">
+         <widget class="PlotWidget" name="decayMx">
+          <property name="maximumSize">
+           <size>
+            <width>600</width>
+            <height>600</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3">
+         <widget class="QLabel" name="label_10">
+          <property name="font">
+           <font>
+            <family>STIX</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Decay In X axis</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1" colspan="3">
+         <widget class="QLabel" name="label_12">
+          <property name="font">
+           <font>
+            <family>STIX</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Recovery In Z axis</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -248,6 +280,9 @@
               <pointsize>14</pointsize>
              </font>
             </property>
+            <property name="text">
+             <string>3000</string>
+            </property>
            </widget>
           </item>
           <item row="2" column="1">
@@ -257,12 +292,15 @@
               <pointsize>14</pointsize>
              </font>
             </property>
+            <property name="text">
+             <string>50</string>
+            </property>
            </widget>
           </item>
           <item row="3" column="1">
            <widget class="QPushButton" name="Reconstruction">
             <property name="text">
-             <string>PushButton</string>
+             <string>Start</string>
             </property>
            </widget>
           </item>
@@ -272,6 +310,9 @@
              <font>
               <pointsize>14</pointsize>
              </font>
+            </property>
+            <property name="text">
+             <string>90</string>
             </property>
            </widget>
           </item>
@@ -354,10 +395,22 @@
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="1">
            <widget class="QLabel" name="Constructed">
+            <property name="minimumSize">
+             <size>
+              <width>512</width>
+              <height>512</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>512</width>
+              <height>512</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>STIX</family>
-              <pointsize>24</pointsize>
+              <pointsize>14</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -372,10 +425,22 @@
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="FourierMatrix">
+            <property name="minimumSize">
+             <size>
+              <width>512</width>
+              <height>512</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>512</width>
+              <height>512</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>STIX</family>
-              <pointsize>24</pointsize>
+              <pointsize>14</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -401,8 +466,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>570</width>
-     <height>20</height>
+     <width>1602</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>

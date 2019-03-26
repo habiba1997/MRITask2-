@@ -35,7 +35,7 @@ class window(QtWidgets.QMainWindow):
         self.RecoveryMz = self.ui.recoveryMz
         self.ui.Reconstruction.clicked.connect(self.Reconstruction)
 
-        self.ui.browse.clicked.connect(self.setImage)
+        self.ui.browse.clicked.connect(self.init)
         self.show()
         self.paint = False
         self.paint1 = False
@@ -44,8 +44,8 @@ class window(QtWidgets.QMainWindow):
         self.paint4 = False
         self.paint5 = False
         self.points = QtGui.QPolygon()
-        self.x = 90
-        self.y = 90
+        self.x = None
+        self.y = None
         self.count = -1
         self.text = '512'
         self.text2 = 'Proton Density'
@@ -111,6 +111,15 @@ class window(QtWidgets.QMainWindow):
         self.error_dialog.showMessage("Please select a proper phantom")
 
 
+    def init(self):
+        self.setImage()
+        self.coord = []
+        self.inten = []
+        self.ui.image.point = []
+        self.clearGraphicView()
+        self.count = -1
+        self.brit = 0
+
     def setImage(self):
         self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp *.mat)") # Ask for file
         if self.fileName: # If the user gives a file
@@ -149,7 +158,7 @@ class window(QtWidgets.QMainWindow):
 
     def angleChan(self):
         self.clearGraphicView()
-        self.count = 0
+        self.count = -1
         for i in self.inten:
             self.T1 = self.createT1(i)
             self.T2 = self.createT2(i)
@@ -163,7 +172,7 @@ class window(QtWidgets.QMainWindow):
             if self.left:
                 image1 = Image.open(self.fileName0)
                 enhancer = ImageEnhance.Brightness(image1)
-                self.brit += 0.05
+                self.brit += 0.01
                 enhanced_img = enhancer.enhance(self.brit)
                 enhanced_img.save('enhanced_img.png')
                 self.fileName4 = 'enhanced_img.png'
@@ -280,8 +289,7 @@ class window(QtWidgets.QMainWindow):
             self.optFrame()
             self.ui.image.paint = True
             self.pixmap1 = self.pixmap0
-            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
-            #self.ui.image.adjustSize()
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
@@ -307,12 +315,9 @@ class window(QtWidgets.QMainWindow):
             self.x2 = self.ui.image.frameGeometry().width()
             self.y2 = self.ui.image.frameGeometry().height()
             self.optFrame()
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
             #self.passCord()
             self.pixmap2 = self.pixmap1
-            self.ui.image.setPixmap(self.pixmap1) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -342,13 +347,10 @@ class window(QtWidgets.QMainWindow):
             self.x2 = self.ui.image.frameGeometry().width()
             self.y2 = self.ui.image.frameGeometry().height()
             self.optFrame()
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
             #self.passCord()
             self.pixmap3 = self.pixmap2
             #self.pixmap2 = self.pixmap2.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap2) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -378,13 +380,10 @@ class window(QtWidgets.QMainWindow):
             self.x2 = self.ui.image.frameGeometry().width()
             self.y2 = self.ui.image.frameGeometry().height()
             self.optFrame()
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
             #self.passCord()
             self.pixmap4 = self.pixmap3
             #self.pixmap3 = self.pixmap3.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap3) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -412,12 +411,9 @@ class window(QtWidgets.QMainWindow):
             self.x2 = self.ui.image.frameGeometry().width()
             self.y2 = self.ui.image.frameGeometry().height()
             self.optFrame()
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
             #self.passCord()
             #self.pixmap4 = self.pixmap4.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap4) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
