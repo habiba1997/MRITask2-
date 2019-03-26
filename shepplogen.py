@@ -1,6 +1,103 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+import numpy as np
+import math
+from matplotlib import pyplot as plt
+# a function that returns T1 ( recovery time ) based on the intensity
+def createT1(intensity):
+
+    if intensity == 100: #Gray matter
+        T1=900
+        
+    elif intensity == 255: #white matter
+        T1= 510
+       
+    elif intensity == 200: #muscle
+        T1=900
+       
+    elif intensity == 120 : #fat
+        T1=300
+        
+    elif intensity == 25: #protein
+        T1=250
+        
+    #elif intensity == 0: #Black => air
+    #    T1=1
+        
+    else: # general case for any phantom whatever its intensity 
+        T1 = (7.5*intensity) + 50
+
+    return T1
+
+def createPD(intensity):
+        if intensity ==0:
+            return 1
+        else:
+            return (1/255)*intensity 
+
+# a function that returns T2 ( decay time ) based on the intensity
+def createT2(intensity):
+
+    if intensity == 100: #Gray matter
+        T2 =90
+   
+    elif intensity == 255: #white matter       
+        T2 =70
+
+    elif intensity == 200: #muscle        
+        T2 = 50
+
+    elif intensity == 120 : #fat        
+        T2 = 100
+
+    elif intensity == 25: #protein       
+        T2 = 30
+
+    #elif intensity == 0: #Black => air        
+    #    T2=0
+
+    else: # general case for any phantom whatever its intensity 
+        T2 = 0.5*intensity+10
+
+    return T2
+
+
+#self.pixmap5 = QtGui.QPixmap(self.fileName4)
+#                self.ui.image.setPixmap(self.pixmap5)
+# self.img[self.x, self.y]
+
+def rotationAroundYaxisMatrix(theta,vector):
+            vector = vector.transpose()
+            theta = (math.pi / 180) * theta
+            R = np.matrix ([[np.cos(theta), 0, np.sin(theta)], [0, 1, 0], [-np.sin(theta), 0, np.cos(theta)]] )
+            R = np.dot(R, vector)
+            R = R.transpose()
+            return np.matrix(R)
+
+
+def rotationAroundZaxisMatrixXY(theta,vector): #time = self.time
+            vector = vector.transpose()
+            theta = (math.pi / 180) * theta
+            XY = np.matrix([[np.cos(theta),-np.sin(theta),0], [np.sin(theta), np.cos(theta),0],[0, 0, 1]])
+            XY = np.dot(XY,vector)
+            XY = XY.transpose()
+            return np.matrix(XY) 
+
+
+def recoveryDecayEquation(T1,T2,PD,vector,time):
+            vector = vector.transpose()
+            Decay =np.matrix([[np.exp(-time/T2),0,0],[0,np.exp(-time/T2),0],[0,0,np.exp(-time/T1)]])
+            Decay = np.dot(Decay,vector)
+        
+            Rec= np.dot(np.matrix([[0,0,(1-(np.exp(-time/T1)))]]),PD)
+            Rec = Rec.transpose()
+            Decay = np.matrix(Decay)
+            Rec =  np.matrix(Rec)    
+        
+            RD  = Decay + Rec
+            RD = RD.transpose()
+            return RD
 
 def phantom (n = 256, p_type = 'Modified Shepp-Logan', ellipses = None):
 	"""
@@ -144,8 +241,158 @@ def _mod_shepp_logan ():
 #	 [[ 0, 0, 0, 0, 0, 0],
 #	  [ 0, 0, 0, 0, 0, 0]])
 
+def createT1(intensity):
+
+    if intensity == 100: #Gray matter
+        T1=900
+        
+    elif intensity == 255: #white matter
+        T1= 510
+       
+    elif intensity == 200: #muscle
+        T1=900
+       
+    elif intensity == 120 : #fat
+        T1=300
+        
+    elif intensity == 25: #protein
+        T1=250
+        
+    #elif intensity == 0: #Black => air
+    #    T1=1
+        
+    else: # general case for any phantom whatever its intensity 
+        T1 = (7.5*intensity) + 50
+
+    return T1
+
+def createPD(intensity):
+        if intensity ==0:
+            return 1
+        else:
+            return (1/255)*intensity 
+
+# a function that returns T2 ( decay time ) based on the intensity
+def createT2(intensity):
+
+    if intensity == 100: #Gray matter
+        T2 =90
+   
+    elif intensity == 255: #white matter       
+        T2 =70
+
+    elif intensity == 200: #muscle        
+        T2 = 50
+
+    elif intensity == 120 : #fat        
+        T2 = 100
+
+    elif intensity == 25: #protein       
+        T2 = 30
+
+    #elif intensity == 0: #Black => air        
+    #    T2=0
+
+    else: # general case for any phantom whatever its intensity 
+        T2 = 0.5*intensity+10
+
+    return T2
+
+def mappingT1 (T1): #T1 in msec assumption
+        return (T1-500)/6
+
+def mappingT2 (T2):  #T1 in msec assumption
+        return (T2-20)/2
 
 
-x = np.matrix(_shepp_logan())
-plt.imshow(x, cmap = "gray")
+img = phantom(n=64)
+T1 = np.zeros((img.shape[0],img.shape[1]))
+T2= np.zeros((img.shape[0],img.shape[1]))
+
+
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+        T1[i,j]=mappingT1(createT1(img[i,j]))
+        T2[i,j]=mappingT2(createT2(img[i,j]))
+
+
+import scipy.io
+
+output = {
+		"Phantom" : img,
+        "T1": T1,
+        "T2":T2,
+	}
+scipy.io.savemat('shapeloggin64', output)
+
+
+
+
+
+
+TE = 50
+vector= np.matrix ([0,0,1]) #da range sabt
+theta = 90 
+TR = 3000
+
+
+Kspace =  np.zeros((9,9),dtype=np.complex_)
+
+signal = [[[0 for k in range(3)] for j in range(img.shape[0])] for i in range(img.shape[1])]
+start = True
+
+for Ki in range(Kspace.shape[0]):
+    #move in each image pixel
+    print('Ki: ',Ki)
+    
+    if start :
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                signal[i][j] =  rotationAroundYaxisMatrix(theta,vector)
+                signal[i][j] = signal[i][j] * np.exp(-TE/createT2(img[i,j]))
+    else:
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                signal[i][j] =  rotationAroundYaxisMatrix(theta,np.matrix(signal[i][j]))
+                signal[i][j] =  signal[i][j] * np.exp(-TE/createT2(img[i,j]))
+    
+    # for kspace column
+    for Kj in range (Kspace.shape[1]):
+        print('Kj: ',Kj)
+        GxStep = ((2 * math.pi) / Kspace.shape[0]) * Kj
+        GyStep = ((2 * math.pi) /Kspace.shape[1]) * Ki
+        
+        
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                totalTheta = (GxStep*j)+ (GyStep*i)
+                z = abs(complex(np.ravel(signal[i][j])[0],np.ravel(signal[i][j])[1]))
+                Kspace[Ki,Kj]= Kspace[Ki,Kj] + (z * np.exp(1j*totalTheta))
+       
+
+
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            signal[i][j] =  rotationAroundYaxisMatrix(theta, vector)
+            signal[i][j] = recoveryDecayEquation(createT1(img[i,j]),createT2(img[i,j]),1,np.matrix(signal[i][j]),TR)
+            signal[i][j] = [[0,0,np.ravel(signal[i][j])[2]]]
+            start = False
+    
+plt.imshow(img, cmap="gray")
 plt.show()
+plt.imshow(abs(Kspace), cmap="gray")
+plt.show()
+
+print(Kspace)
+Kspacefft = np.fft.fft2(Kspace)
+Kspaceifft = np.fft.ifft2(Kspace)
+
+plt.imshow(abs(Kspacefft),cmap="gray" )
+plt.show()
+
+    
+
+
+plt.imshow(abs(Kspaceifft), cmap="gray")
+plt.show()
+

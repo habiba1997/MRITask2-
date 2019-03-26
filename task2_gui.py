@@ -12,7 +12,7 @@ import math
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(570, 533)
+        MainWindow.resize(1000, 1000)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -188,6 +188,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.Constructed.setFont(font)
         self.Constructed.setAlignment(QtCore.Qt.AlignCenter)
+        self.Constructed.setScaledContents(True)
         self.Constructed.setObjectName("Constructed")
         self.gridLayout_4.addWidget(self.Constructed, 0, 1, 1, 1)
         self.FourierMatrix = QtWidgets.QLabel(self.mriSequence)
@@ -198,6 +199,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.FourierMatrix.setFont(font)
         self.FourierMatrix.setAlignment(QtCore.Qt.AlignCenter)
+        self.FourierMatrix.setScaledContents(True)
         self.FourierMatrix.setObjectName("FourierMatrix")
         self.gridLayout_4.addWidget(self.FourierMatrix, 0, 0, 1, 1)
         self.gridLayout_5.addLayout(self.gridLayout_4, 0, 0, 1, 1)
@@ -221,28 +223,25 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label_9.setText(_translate("MainWindow", "Time Repeat"))
         self.browse.setText(_translate("MainWindow", "Browse"))
+        self.flipAngle.setText(_translate('MainWindow', "90"))
+        self.TE.setText(_translate("MainWindow", "50"))
+        self.TR.setText(_translate("MainWindow", "3000"))
         self.tr.setText(_translate("MainWindow", "1"))
         self.te.setText(_translate("MainWindow", "0.4"))
         self.label_12.setText(_translate("MainWindow", "Recovery In Z axis"))
         self.label_3.setText(_translate("MainWindow", "Flip Angle"))
         self.label_10.setText(_translate("MainWindow", "Decay In X axis"))
         self.rotationAngle.setText(_translate("MainWindow", "90"))
-<<<<<<< HEAD
         self.comboBox.setCurrentText(_translate("MainWindow", "512"))
         self.comboBox.setItemText(0, _translate("MainWindow", "512"))
         self.comboBox.setItemText(1, _translate("MainWindow", "120"))
-=======
-        self.comboBox.setCurrentText(_translate("MainWindow", "520"))
-        self.comboBox.setItemText(0, _translate("MainWindow", "520"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "180"))
->>>>>>> 4793b4681d5519420b0a62775d23b1d1d429c841
         self.ImageChange.setItemText(0, _translate("MainWindow", "Proton Density"))
         self.ImageChange.setItemText(1, _translate("MainWindow", "T1"))
         self.ImageChange.setItemText(2, _translate("MainWindow", "T2"))
         self.label_5.setText(_translate("MainWindow", "Time to Echo"))
         self.checkBox.setText(_translate("MainWindow", "Brightness"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Phantom Features"))
-        self.Reconstruction.setText(_translate("MainWindow", "PushButton"))
+        self.Reconstruction.setText(_translate("MainWindow", "Start"))
         self.label_6.setText(_translate("MainWindow", "TE"))
         self.label_7.setText(_translate("MainWindow", "Flip Angle"))
         self.label_8.setText(_translate("MainWindow", "TR"))
@@ -251,7 +250,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.mriSequence), _translate("MainWindow", "MRI Sequence"))
 
 from pyqtgraph import PlotWidget
-<<<<<<< HEAD
 
 class Label(QtWidgets.QLabel):
     def __init__(self, parent=None):
@@ -271,5 +269,3 @@ class Label(QtWidgets.QLabel):
             for self.pixel in self.point:
                 painter.setPen(self.pixel[2])
                 painter.drawEllipse(self.pixel[0], self.pixel[1], 8, 8)
-=======
->>>>>>> 4793b4681d5519420b0a62775d23b1d1d429c841
