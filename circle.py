@@ -9,7 +9,7 @@ img = np.zeros((9,9))
 box1 = np.array([255]*1*1).reshape(1,1)
 box2 = np.array([150]*2*2).reshape(2,2)
 box3 = np.array([125]*2*2).reshape(2,2)
-box4 = np.array([50]*4*4).reshape(4,4)
+box4 = np.array([25]*4*4).reshape(4,4)
 box5 = np.array([200]*1*1).reshape(1,1)
 
 #Generate specific x-y coordinates 
@@ -34,76 +34,69 @@ img[x4:x4+4, y4:y4+4] = box4
 img[x5:x5+1, y5:y5+1] = box5
 
 # a function that returns T1 ( recovery time ) based on the intensity
+
+def createT2(intensity):
+	
+	if intensity == 100: #Gray matter
+            T2 =170
+	elif intensity == 255: #white matter       
+            T2 =150
+	elif intensity == 200: #muscle        
+            T2 = 50
+	elif intensity == 120 : #fat        
+            T2 = 100
+	elif intensity == 25: #protein       
+            T2 = 10
+	elif intensity == 150:
+            T2 = 255
+	elif intensity >= 5:
+            T2 = (0.5*intensity)+10
+	elif intensity >= 0.01:
+            T2 = (intensity*1000) - 100
+	else:
+            T2 = (intensity*1000)  + 255
+	return T2
+
 def createT1(intensity):
 
-    if intensity == 100: #Gray matter
-        T1=255
+        if intensity == 100: #Gray matter
+            T1=255
+            
+        elif intensity == 255: #white matter
+            T1= 100
         
-    elif intensity == 255: #white matter
-        T1= 100
-       
-    elif intensity == 200: #muscle
-        T1=180
-       
-    elif intensity == 120 : #fat
-        T1=200
+        elif intensity == 200: #muscle
+            T1=180
         
-    elif intensity == 25: #protein
-        T1=255
+        elif intensity == 120 : #fat
+            T1=200
+            
+        elif intensity == 25: #protein
+            T1=255
+            
+        elif intensity == 0: #Black => air
+            T1=1
+            
+        elif intensity > 5: #Black => air
+            T1 = (7.5*intensity) + 50
         
-    #elif intensity == 0: #Black => air
-    #    T1=1
-        
-    else: # general case for any phantom whatever its intensity 
-        T1 = (7.5*intensity) + 50
+        elif intensity > 0.01: 
+            T1 = (intensity*1000) - 50
+			
+        else: 
+            T1 = (intensity*1000) + 120
 
-    return T1
-
-
-# a function that returns T2 ( decay time ) based on the intensity
-def createT2(intensity):
-
-    if intensity == 100: #Gray matter
-        T2 =170
-   
-    elif intensity == 255: #white matter       
-        T2 =150
-
-    elif intensity == 200: #muscle        
-        T2 = 50
-
-    elif intensity == 120 : #fat        
-        T2 = 100
-
-    elif intensity == 25: #protein       
-        T2 = 10
-
-    #elif intensity == 0: #Black => air        
-    #    T2=0
-
-    else: # general case for any phantom whatever its intensity 
-        T2 = 0.5*intensity+10
-
-    return T2
+        return T1
 
 
-
-
-"""
-def mappingT1 (T1): #T1 in msec assumption
-        return (T1-500)/6
-
-def mappingT2 (T2):  #T1 in msec assumption
-        return (T2-20)/2"""
-
-T1 = np.zeros((9,9))
-T2= np.zeros((9,9))
+T1 = np.zeros((img.shape[0],img.shape[1]))
+T2= np.zeros((img.shape[0],img.shape[1]))
 
 
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        T1[i,j]=(createT1(img[i,j]))
-        T2[i,j]=(createT2(img[i,j]))
+        T1[i,j]=createT1(img[i,j])
+        T2[i,j]=createT2(img[i,j])
 
 
 import scipy.io
@@ -113,20 +106,15 @@ output = {
         "T1": T1,
         "T2":T2,
 	}
-scipy.io.savemat('phantom9x9', output)
-
-
-
-
-
+scipy.io.savemat('Phantom9x9', output)
 
 plt.imshow(img, cmap="gray")
 plt.show()
-
 plt.imshow(T1, cmap="gray")
 plt.show()
 plt.imshow(T2, cmap="gray")
 plt.show()
+
 
 """
 #self.pixmap5 = QtGui.QPixmap(self.fileName4)
@@ -251,11 +239,14 @@ plt.show()
 
 print(Kspace)
 Kspacefft = np.fft.fft2(Kspace)
-Kspaceifft = np.fft.ifft2(Kspace)
+
+Kspaceifft = np.fft.ifft2((1/(2*math.pi))*Kspace)
 
 plt.imshow(abs(Kspacefft),cmap="gray" )
 plt.show()
 
+plt.imshow(np.abs(Kspaceifft),cmap="gray" )
+plt.show() 
+    
 plt.imshow(abs(Kspaceifft), cmap="gray")
-plt.show()
 """
