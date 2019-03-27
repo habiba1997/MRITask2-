@@ -214,23 +214,13 @@ plt.show()
 
 
 Kspacefft = np.fft.fft2(Kspace)
-Kspaceifft = np.fft.ifft2(Kspace)
+
+Kspaceifft = np.fft.ifft2((1/(2*math.pi))*Kspace)
+
 
 plt.imshow(abs(Kspacefft),cmap="gray" )
 plt.show()
 
-T1 = np.zeros((9,9))
-T2= np.zeros((9,9))
-
-for i in range(Kspacefft.shape[0]):
-    for j in range(Kspacefft.shape[1]):
-        T1[i,j]=createT1(abs(Kspacefft[i,j]))
-        T2[i,j]=createT2(abs(Kspacefft[i,j]))
-
-        
-plt.imshow(np.abs(T1),cmap="gray" )
-plt.show() 
-    
-plt.imshow(np.abs(T2),cmap="gray" )
+plt.imshow(np.abs(Kspaceifft),cmap="gray" )
 plt.show() 
     
