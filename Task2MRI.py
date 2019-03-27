@@ -16,6 +16,7 @@ from imageio import imsave, imread
 import scipy.io as sio
 import io
 from time import sleep
+import pyqtgraph as pg
 
         
 
@@ -34,7 +35,7 @@ class window(QtWidgets.QMainWindow):
         self.RecoveryMz = self.ui.recoveryMz
         self.ui.Reconstruction.clicked.connect(self.Reconstruction)
 
-        self.ui.browse.clicked.connect(self.setImage)
+        self.ui.browse.clicked.connect(self.init)
         self.show()
         self.paint = False
         self.paint1 = False
@@ -43,10 +44,10 @@ class window(QtWidgets.QMainWindow):
         self.paint4 = False
         self.paint5 = False
         self.points = QtGui.QPolygon()
-        self.x = 90
-        self.y = 90
+        self.x = None
+        self.y = None
         self.count = -1
-        self.text = '520'
+        self.text = '512'
         self.text2 = 'Proton Density'
         self.T1 = np.zeros((512,512))
         self.T2 = np.zeros((512,512))
@@ -54,6 +55,10 @@ class window(QtWidgets.QMainWindow):
         self.brit = 0
         self.left = False
         self.right = False
+        self.coord = []
+        self.inten = []
+        self.plotCol = []
+
 
     def getText2(self, index):
         self.text2 = self.ui.ImageChange.itemText(index)
@@ -62,24 +67,38 @@ class window(QtWidgets.QMainWindow):
     def getText(self, index):
         self.text = self.ui.comboBox.itemText(index)
         self.changePic()
+ 
+        
 
     def changePic(self):
         print(self.text, self.text2)
-        if self.text == '520' and self.text2 == 'Proton Density':
+        if self.text == '512' and self.text2 == 'Proton Density':
             self.pixmap = QtGui.QPixmap(self.fileName0)
+            self.pixmap = self.pixmap.scaled(512,512)
+            self.siz = 512
         if self.text == '120' and self.text2 == 'Proton Density':
             self.pixmap = QtGui.QPixmap(self.fileName0)
             self.pixmap = self.pixmap.scaled(120,120)
-        if self.text == '520' and self.text2 == 'T1':
+            self.siz = 120
+        if self.text == '512' and self.text2 == 'T1':
             self.pixmap = QtGui.QPixmap(self.fileName2)
+            self.pixmap = self.pixmap.scaled(512,512)
+            self.siz = 512
         if self.text == '120' and self.text2 == 'T1':
             self.pixmap = QtGui.QPixmap(self.fileName2)
             self.pixmap = self.pixmap.scaled(120,120)
-        if self.text == '520' and self.text2 == 'T2':
+            self.siz = 120
+        if self.text == '512' and self.text2 == 'T2':
             self.pixmap = QtGui.QPixmap(self.fileName3)
+            self.pixmap = self.pixmap.scaled(512,512)
+            self.siz = 512
         if self.text == '120' and self.text2 == 'T2':
             self.pixmap = QtGui.QPixmap(self.fileName3)
             self.pixmap = self.pixmap.scaled(120,120)
+            self.siz = 120
+        #self.ui.image.point = []
+        #self.coord = []
+
 
         
 
@@ -92,6 +111,15 @@ class window(QtWidgets.QMainWindow):
         self.error_dialog.showMessage("Please select a proper phantom")
 
 
+    def init(self):
+        self.setImage()
+        self.coord = []
+        self.inten = []
+        self.ui.image.point = []
+        self.clearGraphicView()
+        self.count = -1
+        self.brit = 0
+
     def setImage(self):
         self.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Image Files (*.png *.jpg *jpeg *.bmp *.mat)") # Ask for file
         if self.fileName: # If the user gives a file
@@ -99,32 +127,44 @@ class window(QtWidgets.QMainWindow):
                return self.showError()
             print(self.fileName)
             output = sio.loadmat (self.fileName)
-
             img = output['Phantom']
+            self.pahntomForLoop =img
             imgT1 = output['T1']
             imgT2 = output['T2']
-            imgT1 = imgT1.astype(np.uint8)
-            imgT2 = imgT2.astype(np.uint8)
-            img = img.astype(np.uint8)
-            imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png", img)
-            imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T1.png", imgT1)
-            imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T2.png", imgT2)
-            self.fileName0 = 'E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png'
-            self.fileName2 = "E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T1.png"
-            self.fileName3 = "E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\T2.png"
+            #imgT1 = imgT1.astype(np.uint8)
+            #imgT2 = imgT2.astype(np.uint8)
+            #img = img.astype(np.uint8)
+            imsave("phantom1.png", img)
+            imsave("T1.png", imgT1)
+            imsave("T2.png", imgT2)
+            self.fileName0 = 'phantom1.png'
+            self.fileName2 = "T1.png"
+            self.fileName3 = "T2.png"
             self.img = cv2.imread(self.fileName0, 0)
-
+            print(self.img.shape)
             self.ui.image.setMouseTracking(False)
             self.ui.image.mousePressEvent = self.getPixel
             self.ui.image.mouseMoveEvent = self.changeCont
-            self.ui.rotationAngle.textChanged.connect((self.plot))
+            self.ui.rotationAngle.textChanged.connect((self.angleChan))
             self.paint = True
             self.ui.comboBox.activated.connect(self.getText)
             self.ui.ImageChange.activated.connect(self.getText2)
             self.pixmap = QtGui.QPixmap(self.fileName0)
+            self.pixmap = self.pixmap.scaled(512,512)
+            self.siz = 512
+            self.ui.image.setPixmap(self.pixmap)
 
 
-            print(self.img[self.x,self.y])
+
+    def angleChan(self):
+        self.clearGraphicView()
+        self.count = -1
+        for i in self.inten:
+            self.T1 = self.createT1(i)
+            self.T2 = self.createT2(i)
+            self.PD = self.createPD(i)
+            self.count += 1
+            self.plot()
 
 
     def changeCont(self, event):
@@ -132,11 +172,12 @@ class window(QtWidgets.QMainWindow):
             if self.left:
                 image1 = Image.open(self.fileName0)
                 enhancer = ImageEnhance.Brightness(image1)
-                self.brit += 0.05
+                self.brit += 0.01
                 enhanced_img = enhancer.enhance(self.brit)
-                enhanced_img.save('E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\enhanced_img.png')
-                self.fileName4 = 'E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\enhanced_img.png'
+                enhanced_img.save('enhanced_img.png')
+                self.fileName4 = 'enhanced_img.png'
                 self.pixmap5 = QtGui.QPixmap(self.fileName4)
+                self.pixmap5 = self.pixmap5.scaled(self.siz, self.siz)
                 self.ui.image.setPixmap(self.pixmap5)
                 print('sa7')
             if self.right:
@@ -144,9 +185,10 @@ class window(QtWidgets.QMainWindow):
                 enhancer = ImageEnhance.Brightness(image1)
                 self.brit -= 0.05
                 enhanced_img = enhancer.enhance(self.brit)
-                enhanced_img.save('E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\enhanced_img.png')
-                self.fileName4 = 'E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\enhanced_img.png'
+                enhanced_img.save('enhanced_img.png')
+                self.fileName4 = 'enhanced_img.png'
                 self.pixmap5 = QtGui.QPixmap(self.fileName4)
+                self.pixmap5 = self.pixmap5.scaled(self.siz, self.siz)
                 self.ui.image.setPixmap(self.pixmap5)
                 print('sa7')
 
@@ -155,50 +197,86 @@ class window(QtWidgets.QMainWindow):
         self.points << e.pos()
         self.update()
  
+    def passCord(self):
+        self.ui.image.point.append([self.x, self.y, self.pen[self.count]])
+        self.ui.image.x = self.ui.image.frameGeometry().width()
+        self.ui.image.y = self.ui.image.frameGeometry().height()
+        print(self.ui.image.point, self.coord)
 
 
     def getPixel(self, event):
         if event.button() == Qt.LeftButton:
             self.left = True
             self.right = False
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.RightButton:    #for contrast left and right button
             self.right = True
             self.left = False
-        if not self.ui.checkBox.isChecked():
-            self.x2 = self.ui.image.frameGeometry().width()
-            self.y2 = self.ui.image.frameGeometry().height()
-            if self.text == '520':
-                siz = 520
-                self.x = event.pos().x() * (siz / self.x2)
-                self.y = event.pos().y() * (siz / self.y2)
-                self.x = math.floor(self.x)
-                self.y = math.floor(self.y)
-                self.T1 = self.createT1(self.img[self.x,self.y])
-                self.T2 = self.createT2(self.img[self.x,self.y])
-                self.PD = self.createPD(self.img[self.x,self.y])
-            if self.text == '120':
-                siz = 120
-                self.x0 = event.pos().x()
-                self.y0 = event.pos().y()
-                self.x = self.x0 * (siz / self.x2)
-                self.y = self.y0 * (siz / self.y2)
-                self.x = math.floor(self.x)
-                self.y = math.floor(self.y)
-                self.T1 = self.createT1(self.img[self.x0,self.y0])
-                self.T2 = self.createT2(self.img[self.x0,self.y0])
-                self.PD = self.createPD(self.img[self.x0,self.y0])
-            self.count += 1
-            print(self.img[self.x, self.y])
-            self.plot()
-            #print(self.count)
-            #print(self.x, self.y)
-            print(self.paint,"paint1:", self.paint1,"paint2:", self.paint2,"paint3:", self.paint3,"paint4:", self.paint4)
-                
+        if event.button() == Qt.LeftButton:
+            if not self.ui.checkBox.isChecked():
+                if self.text == '512':
+                    self.x = event.pos().x()
+                    self.y = event.pos().y()
+                    self.x1 = event.pos().x() * (512 / self.x2)
+                    self.y1 = event.pos().y() * (512 / self.y2)
+                    self.x1 = math.floor(self.x1)
+                    self.y1 = math.floor(self.y1)
+                    self.x2 = self.x1 * (self.img.shape[0] / 512)
+                    self.y2 = self.y1 * (self.img.shape[0] / 512)
+                    self.x2 = math.floor(self.x2)
+                    self.y2 = math.floor(self.y2)
+                    print(self.x2, self.y2)
+                    self.T1 = self.createT1(self.img[self.x2,self.y2])
+                    self.T2 = self.createT2(self.img[self.x2,self.y2])
+                    self.PD = self.createPD(self.img[self.x2,self.y2])
+                    self.coord.append([self.x, self.y])
+                if self.text == '120':
+                    self.x = event.pos().x()
+                    self.y = event.pos().y()
+                    self.x1 = self.x * (512 / self.x2)
+                    self.x1 = math.floor(self.x)
+                    self.y1 = self.y * (512 / self.y2)
+                    self.y1 = math.floor(self.y)
+                    self.x2 = self.x1 * (self.img.shape[0] / 512)
+                    self.y2 = self.y1 * (self.img.shape[0] / 512)
+                    self.x2 = math.floor(self.x2)
+                    self.y2 = math.floor(self.y2)
+                    self.T1 = self.createT1(self.img[self.x2,self.y2])
+                    self.T2 = self.createT2(self.img[self.x2,self.y2])
+                    self.PD = self.createPD(self.img[self.x2,self.y2])
+                    self.coord.append([self.x1, self.y1])
+                self.count += 1
+                if self.count == 4:
+                    self.count = -1
+                self.pen = [QtGui.QPen(QtCore.Qt.green), QtGui.QPen(QtCore.Qt.red), QtGui.QPen(QtCore.Qt.yellow), QtGui.QPen(QtCore.Qt.blue),
+                QtGui.QPen(QtCore.Qt.cyan)]
+                self.plotCol = [pg.mkPen('g'), pg.mkPen('r'), pg.mkPen('y'), pg.mkPen('b'), pg.mkPen('b'), pg.mkPen('c')]
+                self.plot()
+                self.passCord()
+                print(self.x, self.y)
+                self.inten.append(self.img[self.x2,self.y2])
+
+
+
+    def optFrame(self):
+            if self.ui.image.x != self.ui.image.frameGeometry().width() or self.ui.image.y != self.ui.image.frameGeometry().height():
+                self.ui.image.x = self.ui.image.frameGeometry().width()
+                self.ui.image.y = self.ui.image.frameGeometry().height()
+                k = 0
+                for i in self.coord:
+                    x = self.coord[k][0]
+                    y = self.coord[k][1]
+                    self.ui.image.point[k][0] = x / (512 / self.ui.image.frameGeometry().width())
+                    self.ui.image.point[k][1] = y / (512 / self.ui.image.frameGeometry().height())
+                    print(self.ui.image.point[k][0], self.ui.image.point[k][1], self.ui.image.frameGeometry().width(), self.ui.image.frameGeometry().height())
+                    k += 1
+
+
 
     def paintEvent(self, event):
         if self.paint and self.count == -1 and not self.ui.checkBox.isChecked():
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
             self.pixmap0 = self.pixmap
-            #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
             self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
@@ -206,32 +284,26 @@ class window(QtWidgets.QMainWindow):
             self.ui.image.show()
 
         if self.paint and self.count == 0 and not self.ui.checkBox.isChecked():    
-            #pixmap = QtGui.QPixmap(self.fileName) # Setup pixmap with the provided image
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
-            painter = QtGui.QPainter(self.pixmap0)
-            painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            pen = QtGui.QPen(QtCore.Qt.red)
-            painter.setPen(pen)
-            painter.drawEllipse(self.x, self.y, 8, 8)
-            painter.end()
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
+            self.optFrame()
+            self.ui.image.paint = True
             self.pixmap1 = self.pixmap0
-            #pixmap = pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
-            #self.ui.image.adjustSize()
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             self.paint1 = True
             if self.right:
                 self.count = -1
+                self.ui.image.point = []
+                self.coord = []
                 if self.text == '120':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(120,120)
-                if self.text == '520':
+                if self.text == '512':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
-                #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
+                    self.pixmap = self.pixmap.scaled(512,512)
                 self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
                 #self.ui.image.adjustSize()
                 self.ui.image.setScaledContents(True)
@@ -239,19 +311,13 @@ class window(QtWidgets.QMainWindow):
                 self.ui.image.show()
                 self.clearGraphicView()
             #self.paint = False  
-
         if  self.paint1 and self.count == 1 and not self.ui.checkBox.isChecked():
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
-            painter = QtGui.QPainter(self.pixmap1)
-            painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            painter.setPen(QtGui.QPen(QtCore.Qt.green))
-            painter.drawEllipse(self.x, self.y, 8, 8)
-            painter.end()
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
+            self.optFrame()
+            #self.passCord()
             self.pixmap2 = self.pixmap1
-            #self.pixmap1 = self.pixmap1.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap1) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -259,11 +325,16 @@ class window(QtWidgets.QMainWindow):
             self.paint2 = True
             if self.right:
                 self.count = -1
+                self.ui.image.point = []
+                self.coord = []
+                self.inten = []
                 if self.text == '120':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(120,120)
-                if self.text == '520':
+                if self.text == '512':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
+                    self.pixmap = self.pixmap.scaled(512,512)
+
                 #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
                 self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
                 #self.ui.image.adjustSize()
@@ -273,17 +344,13 @@ class window(QtWidgets.QMainWindow):
                 self.clearGraphicView()
             #self.paint1 = False
         if self.paint2 and self.count == 2 and not self.ui.checkBox.isChecked():
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
-            painter = QtGui.QPainter(self.pixmap2)
-            painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            painter.setPen(QtGui.QPen(QtCore.Qt.blue))
-            painter.drawEllipse(self.x, self.y, 8, 8)
-            painter.end()
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
+            self.optFrame()
+            #self.passCord()
             self.pixmap3 = self.pixmap2
             #self.pixmap2 = self.pixmap2.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap2) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -291,11 +358,16 @@ class window(QtWidgets.QMainWindow):
             self.paint3 = True
             if self.right:
                 self.count = -1
+                self.ui.image.point = []
+                self.coord = []
+                self.inten = []
                 if self.text == '120':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(120,120)
-                if self.text == '520':
+                if self.text == '512':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
+                    self.pixmap = self.pixmap.scaled(512,512)
+
                 #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
                 self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
                 #self.ui.image.adjustSize()
@@ -305,17 +377,13 @@ class window(QtWidgets.QMainWindow):
                 self.clearGraphicView()
             #self.paint2 = False
         if self.paint3 and self.count == 3 and not self.ui.checkBox.isChecked():
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
-            painter = QtGui.QPainter(self.pixmap3)
-            painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            painter.setPen(QtGui.QPen(QtCore.Qt.yellow))
-            painter.drawEllipse(self.x, self.y, 8, 8)
-            painter.end()
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
+            self.optFrame()
+            #self.passCord()
             self.pixmap4 = self.pixmap3
             #self.pixmap3 = self.pixmap3.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap3) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
@@ -323,42 +391,45 @@ class window(QtWidgets.QMainWindow):
             self.paint4 = True
             if self.right:
                 self.count = -1
+                self.ui.image.point = []
+                self.coord = []
+                self.inten = []
                 if self.text == '120':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(120,120)
-                if self.text == '520':
+                if self.text == '512':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
-                #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
+                    self.pixmap = self.pixmap.scaled(512,512)
+
                 self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
-                #self.ui.image.adjustSize()
                 self.ui.image.setScaledContents(True)
                 self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
                 self.ui.image.show()
                 self.clearGraphicView()
             #self.paint3 = False     
         if self.paint4 and self.count == 4 and not self.ui.checkBox.isChecked():
-            if self.pixmap0 != self.pixmap:
-                self.count = -1
-                self.clearGraphicView()
-            painter = QtGui.QPainter(self.pixmap4)
-            painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            painter.setPen(QtGui.QPen(QtCore.Qt.darkGray))
-            painter.drawEllipse(self.x, self.y, 8, 8)
-            painter.end()
+            self.x2 = self.ui.image.frameGeometry().width()
+            self.y2 = self.ui.image.frameGeometry().height()
+            self.optFrame()
+            #self.passCord()
             #self.pixmap4 = self.pixmap4.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
-            self.ui.image.setPixmap(self.pixmap4) # Set the pixmap onto the label
+            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
             #self.ui.image.adjustSize()
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
             if self.right:
                 self.count = -1
+                self.ui.image.point = []
+                self.coord = []
+                self.inten = []
                 if self.text == '120':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(120,120)
-                if self.text == '520':
+                if self.text == '512':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
-                #self.pixmap = self.pixmap.scaled(self.ui.image.width(), self.ui.image.height(), QtCore.Qt.KeepAspectRatio)
+                    self.pixmap = self.pixmap.scaled(512,512)
+
                 self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
                 #self.ui.image.adjustSize()
                 self.ui.image.setScaledContents(True)
@@ -394,8 +465,8 @@ class window(QtWidgets.QMainWindow):
             self.Mz = np.append(self.Mz,self.vector.item(2))
         
     
-        self.DecayMx.plot(self.time,np.ravel(self.Mx))
-        self.RecoveryMz.plot(self.time,np.ravel(self.Mz))
+        self.DecayMx.plot(self.time,np.ravel(self.Mx), pen= self.plotCol[self.count])
+        self.RecoveryMz.plot(self.time,np.ravel(self.Mz), pen= self.plotCol[self.count])
 
         self.RecoveryMz.addLine(x=self.Tr)
         self.RecoveryMz.addLine(x=self.Te)
@@ -406,43 +477,41 @@ class window(QtWidgets.QMainWindow):
     
     def createPD(self,intensity):
         return (1/255)*intensity 
-
-    def createT1(intensity):
+    
+    def createT1(self,intensity):
 
         if intensity == 100: #Gray matter
-            T1=900
+            T1=255
             
         elif intensity == 255: #white matter
-            T1= 510
+            T1= 100
         
         elif intensity == 200: #muscle
-            T1=900
+            T1=180
         
         elif intensity == 120 : #fat
-            T1=300
+            T1=200
             
         elif intensity == 25: #protein
-            T1=250
-    
+            T1=255
+            
+        #elif intensity == 0: #Black => air
+        #    T1=1
+            
         else: # general case for any phantom whatever its intensity 
             T1 = (7.5*intensity) + 50
 
         return T1
 
-    def createPD(intensity):
-            if intensity ==0:
-                return 1
-            else:
-                return (1/255)*intensity 
 
-    # a function that returns T2 ( decay time ) based on the intensity
-    def createT2(intensity):
+# a function that returns T2 ( decay time ) based on the intensity
+    def createT2(self,intensity):
 
         if intensity == 100: #Gray matter
-            T2 =90
+            T2 =170
     
         elif intensity == 255: #white matter       
-            T2 =70
+            T2 =150
 
         elif intensity == 200: #muscle        
             T2 = 50
@@ -451,12 +520,16 @@ class window(QtWidgets.QMainWindow):
             T2 = 100
 
         elif intensity == 25: #protein       
-            T2 = 30
+            T2 = 10
+
+        #elif intensity == 0: #Black => air        
+        #    T2=0
 
         else: # general case for any phantom whatever its intensity 
             T2 = 0.5*intensity+10
 
         return T2
+
 
     def returnIntensityfromProtonDensity(self,Pd): # proton intensity vales from 0 till 1 
         return 255*Pd
@@ -504,31 +577,37 @@ class window(QtWidgets.QMainWindow):
         Tr = ((float) (self.ui.TR.text()))
         Te = ((float) (self.ui.TE.text()))
         vector= np.matrix ([0,0,1])  
-        Kspace =  np.zeros((self.img.shape[0],self.img.shape[1]),dtype=np.complex_)
-        
-        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(abs(Kspace)))
-        
+        Kspace =  np.zeros((self.pahntomForLoop.shape[0],self.pahntomForLoop.shape[1]),dtype=np.complex_)
+        #Kspace.fill(255)
+        KspaceSave = abs(Kspace)
+        KspaceSave = KspaceSave.astype(np.uint8)
+        imsave("Kspace.png", KspaceSave)
+        self.fileName5 = "Kspace.png"
+        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
+        #self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5))
+        print(theta,Te,Tr)
         self.ForLoops(theta,Tr,Te,vector,Kspace)
     
     
     def ForLoops(self,theta,TR,TE,vector,Kspace):    
 
-        signal = [[[0 for k in range(3)] for j in range(self.img.shape[0])] for i in range(self.img.shape[1])]
+        signal = [[[0 for k in range(3)] for j in range(self.pahntomForLoop.shape[0])] for i in range(self.pahntomForLoop.shape[1])]
+        print(signal)
         start = True
 
         for Ki in range(Kspace.shape[0]):
             print('Ki: ',Ki)
             #move in each image pixel            
             if start :
-                for i in range(self.img.shape[0]):
-                    for j in range(self.img.shape[1]):
+                for i in range(self.pahntomForLoop.shape[0]):
+                    for j in range(self.pahntomForLoop.shape[1]):
                         signal[i][j] =  self.rotationAroundYaxisMatrix(theta,vector)
-                        signal[i][j] = signal[i][j] * np.exp(-TE/self.createT2(self.img[i,j]))
+                        signal[i][j] = signal[i][j] * np.exp(-TE/self.createT2(self.pahntomForLoop[i,j]))
             else:
-                for i in range(self.img.shape[0]):
-                    for j in range(self.img.shape[1]):
+                for i in range(self.pahntomForLoop.shape[0]):
+                    for j in range(self.pahntomForLoop.shape[1]):
                         signal[i][j] =  self.rotationAroundYaxisMatrix(theta,np.matrix(signal[i][j]))
-                        signal[i][j] =  signal[i][j] * np.exp(-TE/self.createT2(self.img[i,j]))
+                        signal[i][j] =  signal[i][j] * np.exp(-TE/self.createT2(self.pahntomForLoop[i,j]))
             
             # for kspace column
             for Kj in range (Kspace.shape[1]):
@@ -537,23 +616,26 @@ class window(QtWidgets.QMainWindow):
                 GyStep = ((2 * math.pi) /Kspace.shape[1]) * Ki
                 
                 
-                for i in range(self.img.shape[0]):
-                    for j in range(self.img.shape[1]):
+                for i in range(self.pahntomForLoop.shape[0]):
+                    for j in range(self.pahntomForLoop.shape[1]):
                         totalTheta = (GxStep*j)+ (GyStep*i)
                         z = abs(complex(np.ravel(signal[i][j])[0],np.ravel(signal[i][j])[1]))
                         Kspace[Ki,Kj]= Kspace[Ki,Kj] + (z * np.exp(1j*totalTheta))
-            
-                self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(abs(Kspace)))
+                
 
+                #print(Kspace[Ki,Kj])
 
-            for i in range(self.img.shape[0]):
-                for j in range(self.img.shape[1]):
-                    signal[i][j] = self.rotationAroundYaxisMatrix(theta, vector)
-                    signal[i][j] = self.recoveryDecayEquation(self.createT1(self.img[i,j]),self.createT2(self.img[i,j]),1,np.matrix(signal[i][j]),TR)
+            for i in range(self.pahntomForLoop.shape[0]):
+                for j in range(self.pahntomForLoop.shape[1]):
+                    signal[i][j] = self.rotationAroundYaxisMatrix(theta, vector) #Trial
+                    signal[i][j] = self.recoveryDecayEquation(self.createT1(self.pahntomForLoop[i,j]),self.createT2(self.pahntomForLoop[i,j]),1,np.matrix(signal[i][j]),TR)
                     signal[i][j] = [[0,0,np.ravel(signal[i][j])[2]]]
                     start = False
             
         print("DONE")
+        KspaceSave = abs(Kspace)
+        imsave(self.fileName5, KspaceSave)
+        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
         self.ReconstructionImage(Kspace)
 
 
@@ -561,8 +643,13 @@ class window(QtWidgets.QMainWindow):
 
         Kspacefft = np.fft.fft2(Kspace)
         #Kspaceifft = np.fft.ifft2(Kspace)
-
-        self.ui.Constructed.setPixmap(QtGui.QPixmap(abs(Kspace)))
+        Kspacefft = abs(Kspacefft)
+        
+        
+        imsave("image.png", Kspacefft)
+        pixmap = QtGui.QPixmap("image.png")
+        pixmap = pixmap.scaled(512,512)
+        self.ui.Constructed.setPixmap(pixmap)
 
 
 

@@ -109,12 +109,24 @@ for i in range(img.shape[0]):
 
 import scipy.io
 
+<<<<<<< HEAD
+#plot in gray scale
+<<<<<<< HEAD
+img = img.astype(np.uint8)
+imsave("E:\Study\Third year\Second Term\MRI\Task2\Task2\MRITask2-\phantom1.png", img)
+img2 = imread("phantom1.png")
+plt.imshow(img2, cmap="gray")
+plt.show()
+print(img2)
+=======
+=======
 output = {
 		"Phantom" : img,
         "T1": T1,
         "T2":T2,
 	}
 scipy.io.savemat('phantomTwo', output)
+>>>>>>> 4793b4681d5519420b0a62775d23b1d1d429c841
 
 
 

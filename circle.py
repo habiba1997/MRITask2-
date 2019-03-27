@@ -1,23 +1,55 @@
 import numpy as np
 import math
 from matplotlib import pyplot as plt
+
+img = np.zeros((9,9))
+
+#create white box an array [value] is the no. of values and determine the intensity, reshape it into rows and columns
+
+box1 = np.array([255]*1*1).reshape(1,1)
+box2 = np.array([150]*2*2).reshape(2,2)
+box3 = np.array([125]*2*2).reshape(2,2)
+box4 = np.array([50]*4*4).reshape(4,4)
+box5 = np.array([200]*1*1).reshape(1,1)
+
+#Generate specific x-y coordinates 
+
+x1=6
+y1=7
+x2=4
+y2=5
+x3=2
+y3=3
+x4=1
+y4=1
+x5=8
+y5=8
+
+#Replace part of original image with white box
+
+img[x1:x1+1, y1:y1+1] = box1
+img[x2:x2+2, y2:y2+2] = box2
+img[x3:x3+2, y3:y3+2] = box3
+img[x4:x4+4, y4:y4+4] = box4
+img[x5:x5+1, y5:y5+1] = box5
+
 # a function that returns T1 ( recovery time ) based on the intensity
 def createT1(intensity):
 
     if intensity == 100: #Gray matter
-        T1=900
+        T1=255
         
     elif intensity == 255: #white matter
-        T1= 510
+        T1= 100
        
     elif intensity == 200: #muscle
-        T1=900
+        T1=180
        
     elif intensity == 120 : #fat
-        T1=300
+        T1=200
         
     elif intensity == 25: #protein
-        T1=250
+        T1=255
         
     #elif intensity == 0: #Black => air
     #    T1=1
@@ -27,20 +59,15 @@ def createT1(intensity):
 
     return T1
 
-def createPD(intensity):
-        if intensity ==0:
-            return 1
-        else:
-            return (1/255)*intensity 
 
 # a function that returns T2 ( decay time ) based on the intensity
 def createT2(intensity):
 
     if intensity == 100: #Gray matter
-        T2 =90
+        T2 =170
    
     elif intensity == 255: #white matter       
-        T2 =70
+        T2 =150
 
     elif intensity == 200: #muscle        
         T2 = 50
@@ -49,7 +76,7 @@ def createT2(intensity):
         T2 = 100
 
     elif intensity == 25: #protein       
-        T2 = 30
+        T2 = 10
 
     #elif intensity == 0: #Black => air        
     #    T2=0
@@ -60,6 +87,48 @@ def createT2(intensity):
     return T2
 
 
+
+
+"""
+def mappingT1 (T1): #T1 in msec assumption
+        return (T1-500)/6
+
+def mappingT2 (T2):  #T1 in msec assumption
+        return (T2-20)/2"""
+
+T1 = np.zeros((9,9))
+T2= np.zeros((9,9))
+
+
+for i in range(img.shape[0]):
+    for j in range(img.shape[1]):
+        T1[i,j]=(createT1(img[i,j]))
+        T2[i,j]=(createT2(img[i,j]))
+
+
+import scipy.io
+
+output = {
+		"Phantom" : img,
+        "T1": T1,
+        "T2":T2,
+	}
+scipy.io.savemat('phantom9x9', output)
+
+
+
+
+
+
+plt.imshow(img, cmap="gray")
+plt.show()
+
+plt.imshow(T1, cmap="gray")
+plt.show()
+plt.imshow(T2, cmap="gray")
+plt.show()
+
+"""
 #self.pixmap5 = QtGui.QPixmap(self.fileName4)
 #                self.ui.image.setPixmap(self.pixmap5)
 # self.img[self.x, self.y]
@@ -98,39 +167,8 @@ def recoveryDecayEquation(T1,T2,PD,vector,time):
 
 #Generate random array of zeros 512 rows and 512 columns
 
-img = np.zeros((9,9))
-
-#create white box an array [value] is the no. of values and determine the intensity, reshape it into rows and columns
-
-box1 = np.array([255]*1*1).reshape(1,1)
-box2 = np.array([150]*2*2).reshape(2,2)
-box3 = np.array([125]*2*2).reshape(2,2)
-box4 = np.array([50]*4*4).reshape(4,4)
-box5 = np.array([200]*1*1).reshape(1,1)
-
-#Generate specific x-y coordinates 
-
-x1=6
-y1=7
-x2=4
-y2=5
-x3=2
-y3=3
-x4=1
-y4=1
-x5=8
-y5=8
-
-#Replace part of original image with white box
-
-img[x1:x1+1, y1:y1+1] = box1
-img[x2:x2+2, y2:y2+2] = box2
-img[x3:x3+2, y3:y3+2] = box3
-img[x4:x4+4, y4:y4+4] = box4
-img[x5:x5+1, y5:y5+1] = box5
 
 
-"""
 box1 = np.array([25]*70*50).reshape(70,50)
 box2 = np.array([200]*25*150).reshape(25,150)
 box3 = np.array([120]*100*25).reshape(100,25)
@@ -156,9 +194,6 @@ img[x2:x2+25, y2:y2+150] = box2
 img[x3:x3+100, y3:y3+25] = box3
 img[x4:x4+100, y4:y4+50] = box4
 img[x5:x5+50, y5:y5+70] = box5
-"""
-
-
 
 import pprint
 TE = 50
@@ -211,12 +246,15 @@ for Ki in range(Kspace.shape[0]):
     
 plt.imshow(img, cmap="gray")
 plt.show()
+plt.imshow(abs(Kspace), cmap="gray")
+plt.show()
 
-
+print(Kspace)
 Kspacefft = np.fft.fft2(Kspace)
 
 Kspaceifft = np.fft.ifft2((1/(2*math.pi))*Kspace)
 
+<<<<<<< HEAD
 
 plt.imshow(abs(Kspacefft),cmap="gray" )
 plt.show()
@@ -224,3 +262,8 @@ plt.show()
 plt.imshow(np.abs(Kspaceifft),cmap="gray" )
 plt.show() 
     
+=======
+plt.imshow(abs(Kspaceifft), cmap="gray")
+plt.show()
+"""
+>>>>>>> ab8a6abe6c53de315c48f3660d948b9aa515b81e
