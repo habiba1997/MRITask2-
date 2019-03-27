@@ -478,6 +478,29 @@ class window(QtWidgets.QMainWindow):
     def createPD(self,intensity):
         return (1/255)*intensity 
     
+ 
+    def createT2(self,intensity):
+        
+        if intensity == 100: #Gray matter
+                T2 =170
+        elif intensity == 255: #white matter       
+                T2 =150
+        elif intensity == 200: #muscle        
+                T2 = 50
+        elif intensity == 120 : #fat        
+                T2 = 100
+        elif intensity == 25: #protein       
+                T2 = 10
+        elif intensity == 150:
+                T2 = 255
+        elif intensity >= 5:
+                T2 = (0.5*intensity)+10
+        elif intensity >= 0.01:
+                T2 = (intensity*1000) - 100
+        else:
+                T2 = (intensity*1000)  + 255
+        return T2
+
     def createT1(self,intensity):
 
         if intensity == 100: #Gray matter
@@ -495,41 +518,19 @@ class window(QtWidgets.QMainWindow):
         elif intensity == 25: #protein
             T1=255
             
-        #elif intensity == 0: #Black => air
-        #    T1=1
+        elif intensity == 0: #Black => air
+            T1=1
             
-        else: # general case for any phantom whatever its intensity 
+        elif intensity > 5: #Black => air
             T1 = (7.5*intensity) + 50
+        
+        elif intensity > 0.01: 
+            T1 = (intensity*1000) - 50
+			
+        else: 
+            T1 = (intensity*1000) + 120
 
         return T1
-
-
-# a function that returns T2 ( decay time ) based on the intensity
-    def createT2(self,intensity):
-
-        if intensity == 100: #Gray matter
-            T2 =170
-    
-        elif intensity == 255: #white matter       
-            T2 =150
-
-        elif intensity == 200: #muscle        
-            T2 = 50
-
-        elif intensity == 120 : #fat        
-            T2 = 100
-
-        elif intensity == 25: #protein       
-            T2 = 10
-
-        #elif intensity == 0: #Black => air        
-        #    T2=0
-
-        else: # general case for any phantom whatever its intensity 
-            T2 = 0.5*intensity+10
-
-        return T2
-
 
     def returnIntensityfromProtonDensity(self,Pd): # proton intensity vales from 0 till 1 
         return 255*Pd
