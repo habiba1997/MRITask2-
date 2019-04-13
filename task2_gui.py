@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
         self.image = Label(self.centralwidget)
-        self.image.setMinimumSize(QtCore.QSize(512, 512))
+        #self.image.setMinimumSize(QtCore.QSize(512, 512))
         self.image.setMaximumSize(QtCore.QSize(512, 512))
         self.image.setText("")
         self.image.setObjectName("image")
@@ -235,7 +235,7 @@ class Ui_MainWindow(object):
         self.comboBox.setItemText(1, _translate("MainWindow", "120"))
         self.checkBox.setText(_translate("MainWindow", "Brightness"))
         self.browse.setText(_translate("MainWindow", "Browse"))
-        self.tr.setText(_translate("MainWindow", "1"))
+        self.tr.setText(_translate("MainWindow", "0.8"))
         self.rotationAngle.setText(_translate("MainWindow", "90"))
         self.te.setText(_translate("MainWindow", "0.4"))
         self.label_3.setText(_translate("MainWindow", "Flip Angle"))
@@ -271,8 +271,7 @@ class Label(QtWidgets.QLabel):
         super().paintEvent(e)
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        if self.paint:
-            for self.pixel in self.point:
+        for self.pixel in self.point:
                 painter.setPen(self.pixel[2])
                 painter.drawEllipse(self.pixel[0], self.pixel[1], 8, 8)
 

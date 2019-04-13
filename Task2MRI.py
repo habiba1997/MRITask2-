@@ -9,7 +9,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QFileDialog
 from PyQt5.QtGui import QImage, QColor, QBrush, QPainter, QPen, QDragEnterEvent
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread
 from task2_gui import Ui_MainWindow
 from PIL import Image, ImageEnhance
 from imageio import imsave, imread
@@ -25,7 +25,7 @@ class window(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.time  = np.arange(0,10,0.001) #in sec but step in 1 msec
+        self.time  = np.arange(0,1,0.001) #in sec but step in 1 msec
         self.vector= np.matrix ([0,0,1]) #da range sabt
 
         #self.DecayMx = self.ui.decayMx
@@ -62,7 +62,10 @@ class window(QtWidgets.QMainWindow):
         self.text = self.ui.comboBox.itemText(index)
         self.changePic()
  
-        
+    def StartThred(self):
+        self.thread = QThread()
+        self.thread.started.connect(self.Reconstruction)
+        self.thread.start()
 
     def changePic(self):
         print(self.text, self.text2)
@@ -122,18 +125,16 @@ class window(QtWidgets.QMainWindow):
                return self.showError()
             print(self.fileName)
             output = sio.loadmat (self.fileName)
-            img = output['Phantom']
-            self.pahntomForLoop =img
-            imgT1 = output['T1']
-            imgT2 = output['T2']
-            imsave("phantom1.png", img)
-            imsave("T1.png", imgT1)
-            imsave("T2.png", imgT2)
+            self.img = output['Phantom']
+            self.pahntomForLoop = self.img
+            self.imgT1 = output['T1']
+            self.imgT2 = output['T2']
+            imsave("phantom1.png", self.img)
+            imsave("T1.png", self.imgT1)
+            imsave("T2.png", self.imgT2)
             self.fileName0 = 'phantom1.png'
             self.fileName2 = "T1.png"
             self.fileName3 = "T2.png"
-            self.img = cv2.imread(self.fileName0, 0)
-            print(self.img.shape)
             self.ui.image.setMouseTracking(False)
             self.ui.image.mousePressEvent = self.getPixel
             self.ui.image.mouseMoveEvent = self.changeCont
@@ -146,7 +147,8 @@ class window(QtWidgets.QMainWindow):
             self.siz = 512
             self.ui.image.setPixmap(self.pixmap)
 
- 
+    def createPD(self,intensity):
+            return (1/255)*intensity
 
 
     def angleChan(self):
@@ -183,8 +185,6 @@ class window(QtWidgets.QMainWindow):
                 self.pixmap5 = QtGui.QPixmap(self.fileName4)
                 self.pixmap5 = self.pixmap5.scaled(self.siz, self.siz)
                 self.ui.image.setPixmap(self.pixmap5)
-                print('sa7')
-
 
     def mousePressEvent(self, e):
         self.points << e.pos()
@@ -209,32 +209,28 @@ class window(QtWidgets.QMainWindow):
                 if self.text == '512':
                     self.x = event.pos().x()
                     self.y = event.pos().y()
-                    self.x1 = event.pos().x() * (512 / self.x2)
-                    self.y1 = event.pos().y() * (512 / self.y2)
-                    self.x1 = math.floor(self.x1)
-                    self.y1 = math.floor(self.y1)
-                    self.x2 = self.x1 * (self.img.shape[0] / 512)
-                    self.y2 = self.y1 * (self.img.shape[0] / 512)
+                    self.x2 = self.x * (self.img.shape[0] / 512)
+                    self.y2 = self.y * (self.img.shape[0] / 512)
                     self.x2 = math.floor(self.x2)
                     self.y2 = math.floor(self.y2)
                     print(self.x2, self.y2)
-                    self.T1 = self.createT1(self.img[self.x2,self.y2])
-                    self.T2 = self.createT2(self.img[self.x2,self.y2])
+                    self.T1 = self.createT1(self.imgT1[self.x2,self.y2])
+                    self.T2 = self.createT2(self.imgT2[self.x2,self.y2])
                     self.PD = self.createPD(self.img[self.x2,self.y2])
                     self.coord.append([self.x, self.y])
                 if self.text == '120':
                     self.x = event.pos().x()
                     self.y = event.pos().y()
                     self.x1 = self.x * (512 / self.x2)
-                    self.x1 = math.floor(self.x)
+                    self.x1 = math.floor(self.x1)
                     self.y1 = self.y * (512 / self.y2)
-                    self.y1 = math.floor(self.y)
+                    self.y1 = math.floor(self.y1)
                     self.x2 = self.x1 * (self.img.shape[0] / 512)
                     self.y2 = self.y1 * (self.img.shape[0] / 512)
                     self.x2 = math.floor(self.x2)
                     self.y2 = math.floor(self.y2)
-                    self.T1 = self.createT1(self.img[self.x2,self.y2])
-                    self.T2 = self.createT2(self.img[self.x2,self.y2])
+                    self.T1 = self.createT1(self.imgT1[self.x2,self.y2])
+                    self.T2 = self.createT2(self.imgT2[self.x2,self.y2])
                     self.PD = self.createPD(self.img[self.x2,self.y2])
                     self.coord.append([self.x1, self.y1])
                 self.count += 1
@@ -245,7 +241,6 @@ class window(QtWidgets.QMainWindow):
                 self.plotCol = [pg.mkPen('g'), pg.mkPen('r'), pg.mkPen('y'), pg.mkPen('b'), pg.mkPen('b'), pg.mkPen('c')]
                 self.plot()
                 self.passCord()
-                print(self.img[self.x2, self.x2])
                 self.inten.append(self.img[self.x2,self.y2])
 
 
@@ -281,7 +276,8 @@ class window(QtWidgets.QMainWindow):
             self.y2 = self.ui.image.frameGeometry().height()
             self.optFrame()
             self.ui.image.paint = True
-            self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
+            self.pixmap0 = self.pixmap
+            self.ui.image.setPixmap(self.pixmap0) # Set the pixmap onto the label
             self.ui.image.setScaledContents(True)
             self.ui.image.setAlignment(QtCore.Qt.AlignCenter)
             self.ui.image.show()
@@ -291,10 +287,10 @@ class window(QtWidgets.QMainWindow):
                 self.ui.image.point = []
                 self.coord = []
                 self.inten = []
-                if self.text == '120':
+                if self.text == '120' and self.text2 == 'Proton Density':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(120,120)
-                if self.text == '512':
+                if self.text == '512' and self.text2 == 'Proton Density':
                     self.pixmap = QtGui.QPixmap(self.fileName0)
                     self.pixmap = self.pixmap.scaled(512,512)
                 self.ui.image.setPixmap(self.pixmap) # Set the pixmap onto the label
@@ -326,7 +322,7 @@ class window(QtWidgets.QMainWindow):
 
         for i in range(len(self.time)):
             #self.vector = self.rotationAroundZaxisMatrixXY(self.Tr,speed,self.vector,self.time[i])
-            self.vector = self.recoveryDecayEquation(self.T1,self.T2,self.PD,self.vector,self.time[i])
+            self.vector = self.recoveryDecayEquation(self.T1,self.T2,1,self.vector,self.time[i])
             
             self.Mx = np.append(self.Mx,self.vector.item(0))
             self.Mz = np.append(self.Mz,self.vector.item(2))
@@ -341,11 +337,6 @@ class window(QtWidgets.QMainWindow):
         self.DecayMx.addLine(x=self.Te)
 
 
-    
-    def createPD(self,intensity):
-        return (1/255)*intensity 
-    
- 
     def createT2(self,intensity):
         
         if intensity == 100: #Gray matter
@@ -360,12 +351,13 @@ class window(QtWidgets.QMainWindow):
                 T2 = 10
         elif intensity == 150:
                 T2 = 255
-        elif intensity >= 5:
-                T2 = (0.5*intensity)+10
-        elif intensity >= 0.01:
-                T2 = (intensity*1000) - 100
-        else:
-                T2 = (intensity*1000)  + 255
+
+        elif intensity > 1: #Black => air
+                T2 = (0.5*intensity) + 20
+        
+        elif intensity <= 1: 
+            T2 = (intensity*100) + 10
+
         return T2
 
     def createT1(self,intensity):
@@ -388,16 +380,13 @@ class window(QtWidgets.QMainWindow):
         elif intensity == 0: #Black => air
             T1=1
             
-        elif intensity > 5: #Black => air
-            T1 = (7.5*intensity) + 50
+        elif intensity > 1: #Black => air
+            T1 = round((7.5*intensity) + 50)
         
-        elif intensity > 0.01: 
-            T1 = (intensity*1000) - 50
-			
-        else: 
-            T1 = (intensity*1000) + 120
-
+        else:
+            T1 = (intensity*100) + ((intensity * 100) +50)
         return T1
+
 
     def returnIntensityfromProtonDensity(self,Pd): # proton intensity vales from 0 till 1 
         return 255*Pd
@@ -448,9 +437,9 @@ class window(QtWidgets.QMainWindow):
         Kspace =  np.zeros((self.pahntomForLoop.shape[0],self.pahntomForLoop.shape[1]),dtype=np.complex_)
         #Kspace.fill(255)
         KspaceSave = abs(Kspace)
-        imsave("Kspace.png", KspaceSave)
+        #imsave("Kspace.png", KspaceSave)
         self.fileName5 = "Kspace.png"
-        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
+        #self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
         #self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5))
         print(theta,Te,Tr)
         self.ForLoops(theta,Tr,Te,vector,Kspace)
@@ -475,11 +464,7 @@ class window(QtWidgets.QMainWindow):
                     for j in range(self.pahntomForLoop.shape[1]):
                         signal[i][j] =  self.rotationAroundYaxisMatrix(theta,np.matrix(signal[i][j]))
                         signal[i][j] =  signal[i][j] * np.exp(-TE/self.createT2(self.pahntomForLoop[i,j]))
-            KspaceSave = abs(Kspace)
-            imsave(self.fileName5, KspaceSave)
-            self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
-            self.ReconstructionImage(Kspace)
-            sleep(0.1)
+
             # for kspace column
             for Kj in range (Kspace.shape[1]):
                 print('Kj: ',Kj)
@@ -492,9 +477,7 @@ class window(QtWidgets.QMainWindow):
                         totalTheta = (GxStep*j)+ (GyStep*i)
                         z = abs(complex(np.ravel(signal[i][j])[0],np.ravel(signal[i][j])[1]))
                         Kspace[Ki,Kj]= Kspace[Ki,Kj] + (z * np.exp(1j*totalTheta))
-                
 
-                #print(Kspace[Ki,Kj])
 
             for i in range(self.pahntomForLoop.shape[0]):
                 for j in range(self.pahntomForLoop.shape[1]):
@@ -502,17 +485,32 @@ class window(QtWidgets.QMainWindow):
                     signal[i][j] = self.recoveryDecayEquation(self.createT1(self.pahntomForLoop[i,j]),self.createT2(self.pahntomForLoop[i,j]),1,np.matrix(signal[i][j]),TR)
                     signal[i][j] = [[0,0,np.ravel(signal[i][j])[2]]]
                     start = False
+
             
         print("DONE")
         KspaceSave = abs(Kspace)
-        imsave(self.fileName5, KspaceSave)
-        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
-        self.ReconstructionImage(Kspace)
+        print('Hello')
+        print(Kspace)
+        imsave('kspace.png', KspaceSave)
+        print("DONE1")
+        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap('kspace.png').scaled(512,512))
+        print("DONE2")
+        Kspacefft = np.fft.fft2(Kspace)
+        #Kspaceifft = np.fft.ifft2(Kspace)
+        print("DONE3")
+        Kspacefft = abs(Kspacefft)
+        imsave("image.png", Kspacefft)
+        print("DONE4")
+        pixmap = QtGui.QPixmap("image.png")
+        pixmap = pixmap.scaled(512,512)
+        self.ui.Constructed.setPixmap(pixmap)
 
 
     def ReconstructionImage(self,Kspace): 
-
-        Kspacefft = np.fft.fft2(Kspace)
+        KspaceSave = abs(Kspace)
+        imsave(self.fileName5, KspaceSave)
+        self.ui.FourierMatrix.setPixmap(QtGui.QPixmap(self.fileName5).scaled(512,512))
+        Kspacefft = np.fft.ifft2(Kspace)
         #Kspaceifft = np.fft.ifft2(Kspace)
         Kspacefft = abs(Kspacefft)
         imsave("image.png", Kspacefft)

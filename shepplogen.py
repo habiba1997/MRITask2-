@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from matplotlib import pyplot as plt
+from imageio import imsave, imread
 # a function that returns T1 ( recovery time ) based on the intensity
 #self.pixmap5 = QtGui.QPixmap(self.fileName4)
 #                self.ui.image.setPixmap(self.pixmap5)
@@ -144,26 +145,27 @@ def _mod_shepp_logan ():
 
 
 def createT2(intensity):
-	
-	if intensity == 100: #Gray matter
-            T2 =170
-	elif intensity == 255: #white matter       
-            T2 =150
-	elif intensity == 200: #muscle        
-            T2 = 50
-	elif intensity == 120 : #fat        
-            T2 = 100
-	elif intensity == 25: #protein       
-            T2 = 10
-	elif intensity == 150:
-            T2 = 255
-	elif intensity >= 5:
-            T2 = (0.5*intensity)+10
-	elif intensity >= 0.01:
-            T2 = (intensity*1000) - 100
-	else:
-            T2 = (intensity*1000)  + 255
-	return T2
+        
+        if intensity == 100: #Gray matter
+                T2 =170
+        elif intensity == 255: #white matter       
+                T2 =150
+        elif intensity == 200: #muscle        
+                T2 = 50
+        elif intensity == 120 : #fat        
+                T2 = 100
+        elif intensity == 25: #protein       
+                T2 = 10
+        elif intensity == 150:
+                T2 = 255
+
+        elif intensity > 1: #Black => air
+                T2 = (0.5*intensity) + 20
+        
+        elif intensity <= 1: 
+            T2 = (intensity*100) + 10
+
+        return T2
 
 def createT1(intensity):
 
@@ -185,22 +187,17 @@ def createT1(intensity):
         elif intensity == 0: #Black => air
             T1=1
             
-        elif intensity > 5: #Black => air
-            T1 = (7.5*intensity) + 50
+        elif intensity > 1: #Black => air
+            T1 = round((7.5*intensity) + 50)
         
-        elif intensity > 0.01: 
-            T1 = (intensity*1000) - 50
-			
-        else: 
-            T1 = (intensity*1000) + 120
-
+        else:
+            T1 = (intensity*100) + ((intensity * 100) +50)
         return T1
 
 
 
-
     
-img = phantom(n=64)
+img = phantom(n=512) #d5aly fel n el shape bta3 el phantom bta3k "el resolution ya3ny" ana hena med5al 512, momkn ted5aly 64
 
 T1 = np.zeros((img.shape[0],img.shape[1]))
 T2= np.zeros((img.shape[0],img.shape[1]))
@@ -208,24 +205,20 @@ T2= np.zeros((img.shape[0],img.shape[1]))
 
 for i in range(img.shape[0]):
     for j in range(img.shape[1]):
-        T1[i,j]=(createT1(img[i,j]))
-        T2[i,j]=(createT2(img[i,j]))
+        T1[i,j]=createT1(img[i,j])
+        T2[i,j]=createT2(img[i,j])
 
 
-import scipy.io
 
-output = {
-		"Phantom" : img,
-        "T1": T1,
-        "T2":T2,
-	}
-scipy.io.savemat('Shapeloggin64x64', output)
 
 plt.imshow(img, cmap="gray")
+imsave("phantom.png", img)
 plt.show()
 plt.imshow(T1, cmap="gray")
+imsave("T1.png", T1)
 plt.show()
 plt.imshow(T2, cmap="gray")
+imsave("T2", T2)
 plt.show()
 
 

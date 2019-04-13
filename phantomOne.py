@@ -36,26 +36,27 @@ img[x4:x4+100, y4:y4+50] = box4
 img[x5:x5+50, y5:y5+70] = box5
 
 def createT2(intensity):
-	
-	if intensity == 100: #Gray matter
-            T2 =170
-	elif intensity == 255: #white matter       
-            T2 =150
-	elif intensity == 200: #muscle        
-            T2 = 50
-	elif intensity == 120 : #fat        
-            T2 = 100
-	elif intensity == 25: #protein       
-            T2 = 10
-	elif intensity == 150:
-            T2 = 255
-	elif intensity >= 5:
-            T2 = (0.5*intensity)+10
-	elif intensity >= 0.01:
-            T2 = (intensity*1000) - 100
-	else:
-            T2 = (intensity*1000)  + 255
-	return T2
+        
+        if intensity == 100: #Gray matter
+                T2 =170
+        elif intensity == 255: #white matter       
+                T2 =150
+        elif intensity == 200: #muscle        
+                T2 = 50
+        elif intensity == 120 : #fat        
+                T2 = 100
+        elif intensity == 25: #protein       
+                T2 = 10
+        elif intensity == 150:
+                T2 = 255
+
+        elif intensity > 0.1: #Black => air
+                T2 = (0.5*intensity) + 20
+        
+        elif intensity <= 0.1: 
+            T2 = (intensity*1000) + 10
+
+        return T2
 
 def createT1(intensity):
 
@@ -77,18 +78,14 @@ def createT1(intensity):
         elif intensity == 0: #Black => air
             T1=1
             
-        elif intensity > 5: #Black => air
-            T1 = (7.5*intensity) + 50
+        elif intensity > 0.1: #Black => air
+            T1 = round((7.5*intensity) + 50)
         
-        elif intensity > 0.01: 
-            T1 = (intensity*1000) - 50
+        elif intensity <= 0.1: 
+            T1 = (intensity*1000) + ((intensity * 1000) +50)
 			
-        else: 
-            T1 = (intensity*1000) + 120
-
         return T1
-
-
+        
 T1 = np.zeros((img.shape[0],img.shape[1]))
 T2= np.zeros((img.shape[0],img.shape[1]))
 
